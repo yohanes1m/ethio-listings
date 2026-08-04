@@ -5,7 +5,7 @@
 
 ---
 
-## Phase 0 — Repo + GitHub Setup 🔄
+## Phase 0 — Repo + GitHub Setup ✅
 - [x] Mono-repo folder created: /home/john/common/ethio-listings/
 - [x] api/ web/ mini/ bot/ skeleton folders created
 - [x] Root .gitignore written (Python + Node + .env)
@@ -15,13 +15,13 @@
 - [x] .github/ISSUE_TEMPLATE/task.md + bug.md written
 - [x] .github/pull_request_template.md written
 - [x] STATUS.md + README.md committed
-- [ ] GitHub repo created: github.com/yohanes1m/ethio-listings
-- [ ] `dev` branch created and pushed
-- [ ] Initial commit pushed to main
-- [ ] Branch protection set on main + dev (PR required, yohanes1m only can merge)
-- [ ] Issue labels created (task, bug, backend, frontend, phase-0..16, good-first-issue, blocked, in-progress)
-- [ ] GitHub secrets set: OPENAI_API_KEY, SENTRY_DSN (for CI)
-- [ ] pre-commit install run
+- [x] GitHub repo created: github.com/yohanes1m/ethio-listings
+- [x] `dev` branch created and pushed
+- [x] Initial commit pushed to main
+- [x] Branch protection set on main + dev (PR required, 1 approving review, stale reviews dismissed)
+- [x] Issue labels created (task, bug, backend, frontend, phase-0..16, good-first-issue, blocked, in-progress)
+- [ ] GitHub secrets set: OPENAI_API_KEY, SENTRY_DSN (for CI) — set manually in repo settings
+- [ ] pre-commit install run — run locally: `pip install pre-commit && pre-commit install`
 
 ## Phase 1 — Django Scaffold ⬜
 - [ ] django-admin startproject config . (inside api/)
