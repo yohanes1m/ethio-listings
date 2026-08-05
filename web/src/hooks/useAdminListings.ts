@@ -63,7 +63,29 @@ export function useCreateListing() {
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
       authApiClient.post('/listings/create/', data).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['listings', 'mine'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['listings', 'mine'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'listings'] })
+    },
+  })
+}
+
+export function useCreateBroker() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (data: {
+      first_name: string
+      last_name: string
+      email: string
+      phone: string
+      password: string
+    }) => {
+      const res = await authApiClient.post<{ id: string }>('/auth/register/', data)
+      const userId = res.data.id
+      await authApiClient.patch(`/auth/users/${userId}/role/`, { role: 'BROKER' })
+      return res.data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }),
   })
 }
 
