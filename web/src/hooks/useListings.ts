@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import apiClient from '@/lib/apiClient'
-import type { Listing, PaginatedListings, PlatformStats } from '@/types/listing'
+import type { Listing, MapPin, PaginatedListings, PlatformStats } from '@/types/listing'
 
 interface PublicListingsParams {
   category?: string
@@ -43,6 +43,25 @@ export function useListing(id: string) {
     queryFn: () =>
       apiClient.get<Listing>(`/listings/${id}/`).then((r) => r.data),
     enabled: !!id,
+  })
+}
+
+export function useMapPins(category?: string) {
+  return useQuery({
+    queryKey: ['listings', 'map', category],
+    queryFn: () =>
+      apiClient
+        .get<MapPin[]>('/listings/map/', { params: category ? { category } : {} })
+        .then((r) => r.data),
+    staleTime: 60_000,
+  })
+}
+
+export function useMyListings() {
+  return useQuery({
+    queryKey: ['listings', 'mine'],
+    queryFn: () =>
+      apiClient.get<Listing[]>('/listings/mine/').then((r) => r.data),
   })
 }
 

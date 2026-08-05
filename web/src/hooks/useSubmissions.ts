@@ -13,6 +13,28 @@ export function useMySubmissions() {
   })
 }
 
+export function useSubmissions(status?: string) {
+  return useQuery({
+    queryKey: ['submissions', 'queue', status],
+    queryFn: () =>
+      authApiClient
+        .get<Submission[]>('/submissions/', { params: status ? { status } : {} })
+        .then((r) => r.data),
+  })
+}
+
+export function useUpdateSubmission() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      authApiClient.patch(`/submissions/${id}/`, { status }).then((r) => r.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['submissions'] })
+      toast.success('Submission updated')
+    },
+  })
+}
+
 export function useSubmit() {
   const queryClient = useQueryClient()
 

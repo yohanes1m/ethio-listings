@@ -97,6 +97,16 @@ export interface Listing {
   updated_at: string
 }
 
+export interface MapPin {
+  id: string
+  title: string
+  title_am: string | null
+  price: string | null
+  category: string
+  lat: string
+  lng: string
+}
+
 export interface PaginatedListings {
   count: number
   next: string | null
