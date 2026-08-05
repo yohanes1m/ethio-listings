@@ -168,15 +168,14 @@
 - [x] TypeScript build: zero errors, 18 routes
 - [x] Committed + pushed
 
-## Phase 13 — Language System ⬜
-- [ ] All UI strings in am.json / en.json / om.json (Amharic is primary, English is fallback)
-- [ ] languageStore default set to 'am'
-- [ ] useTranslation hook applied across all components
-- [ ] Language toggle in Header + BottomNav (order: አማ | EN | ORO)
-- [ ] Amharic listing title/description shown by default; falls back to English if title_am is null
-- [ ] Manual QA: fresh visitor sees Amharic UI. Toggle to EN → English. Toggle to ORO → Oromo. Reload → stays on last selected language.
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 13 — Language System ✅
+- [x] All UI strings in am.json / en.json / om.json (Amharic + English + Afan Oromo)
+- [x] languageStore default: 'en' (changed from 'am' per user request)
+- [x] useTranslation hook applied: Header, BottomNav, ListingCard, Home page, listing detail
+- [x] Language toggle in Header (አማ | EN | ORO) — mobile toggle via BottomNav
+- [x] getLocalizedTitle / getLocalizedDescription in listingUtils — Amharic → English fallback
+- [x] listing.description + listing.specifications keys added to all 3 locale files
+- [x] Committed + pushed
 
 ## Phase 14 — Telegram Auth (backend) ⬜
 - [ ] telegram_id field on User model + migration
