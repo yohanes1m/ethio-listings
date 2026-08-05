@@ -92,13 +92,14 @@
 - [x] Full suite: 98 tests pass in 2.35s
 - [x] Committed + pushed
 
-## Phase 6 — Deals API ⬜
-- [ ] POST /api/listings/<id>/close/ (all deal fields optional)
-- [ ] GET /api/deals/ (broker: own; admin: all)
-- [ ] GET /api/deals/summary/ (earnings totals per broker)
-- [ ] Automated tests written (test_deals.py)
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 6 — Deals API ✅
+- [x] POST /api/deals/listings/<id>/close/ (all financial fields optional, auto-calc commission)
+- [x] GET /api/deals/ (broker: own; admin: all — BROKER/ADMIN only)
+- [x] GET /api/deals/summary/ (deals_count, total_commission, this_month — BROKER/ADMIN only)
+- [x] Bug fix: DealListView + DealSummaryView were allowing buyers (missing IsBrokerOrAdmin check)
+- [x] Automated tests written (test_deals.py) — 16 tests all passing
+- [x] Full suite: 114 tests in 1.85s
+- [x] Committed + pushed
 
 ## Phase 7 — AI Service ⬜
 - [ ] POST /api/ai/generate-listing/ (6 multilingual fields)

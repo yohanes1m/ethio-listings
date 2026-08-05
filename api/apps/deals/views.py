@@ -22,6 +22,8 @@ class DealListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        from apps.common.permissions import IsBrokerOrAdmin
+        IsBrokerOrAdmin().check_object_permissions(request, None)
         if request.user.role == "ADMIN":
             qs = Deal.objects.select_related("listing", "closed_by", "co_broker")
         else:
@@ -33,6 +35,8 @@ class DealSummaryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        from apps.common.permissions import IsBrokerOrAdmin
+        IsBrokerOrAdmin().check_object_permissions(request, None)
         from django.utils import timezone
         from datetime import timedelta
 

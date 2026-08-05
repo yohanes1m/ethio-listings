@@ -2,10 +2,11 @@ import factory
 from factory.django import DjangoModelFactory
 
 from apps.cars.models import CarDetails, CarCondition, FuelType, Transmission
+from apps.deals.models import Deal
 from apps.favorites.models import Favorite
 from apps.houses.models import HouseDetails, HouseType
 from apps.lands.models import LandDetails, LandUse
-from apps.listings.models import Listing, ListingCategory, ListingType, Location
+from apps.listings.models import Listing, ListingCategory, ListingStatus, ListingType, Location
 from apps.machines.models import MachineDetails, MachineCondition
 from apps.media.models import ListingMedia
 from apps.submissions.models import ListingRequest, SubmissionStatus
@@ -161,3 +162,25 @@ class FavoriteFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     listing = factory.SubFactory(ListingFactory)
+
+
+class ClosedListingFactory(DjangoModelFactory):
+    class Meta:
+        model = Listing
+
+    user = factory.SubFactory(BrokerFactory)
+    category = ListingCategory.HOUSE
+    listing_type = ListingType.SALE
+    title = factory.Sequence(lambda n: f"Closed Listing {n}")
+    status = ListingStatus.SOLD
+
+
+class DealFactory(DjangoModelFactory):
+    class Meta:
+        model = Deal
+
+    listing = factory.SubFactory(ClosedListingFactory)
+    closed_by = factory.SubFactory(BrokerFactory)
+    actual_price = 3500000
+    commission_rate = 3
+    commission_amount = 105000
