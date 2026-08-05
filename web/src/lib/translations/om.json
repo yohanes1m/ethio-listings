@@ -64,7 +64,9 @@
     "area": "Bal'ina",
     "per_month": "/ji'a",
     "per_year": "/waggaa",
-    "negotiable": "Gatii Marii Danda'a"
+    "negotiable": "Gatii Marii Danda'a",
+    "description": "Ibsa",
+    "specifications": "Addaawwummaa"
   },
   "auth": {
     "login_title": "Seeni",

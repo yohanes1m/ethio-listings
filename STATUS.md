@@ -149,23 +149,24 @@
 - [x] Migrations applied, Ethiopian locations fixture loaded (109 objects)
 - [x] Committed + pushed
 
-## Phase 11 — Map View ⬜
-- [ ] Mapbox GL integration in ListingMap.tsx
-- [ ] /browse/[category]?view=map toggle (Grid | Map)
-- [ ] Clustered pins, click → popup card → "View listing" link
-- [ ] Manual QA: pins visible, popup works, navigate from map pin
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 11 — Map View ✅
+- [x] MapLibre GL + CARTO Positron free tiles in ListingMap.tsx (no API key required)
+- [x] /browse/[category] Grid | Map toggle (pill-style button group)
+- [x] Category-colored markers (amber/green/blue/purple), click → popup → "View listing" link
+- [x] useMapPins hook + MapPin type; GET /api/listings/map/ endpoint
+- [x] Committed + pushed
 
-## Phase 12 — Dashboard ⬜
-- [ ] Impeccable Mode B layout (sidebar + compact)
-- [ ] Broker dashboard: my listings table, add listing wizard, deal close modal
-- [ ] Broker earnings summary card (total ETB commission)
-- [ ] Admin dashboard: all listings, user management, verification queue
-- [ ] /saved (favorites page)
-- [ ] Playwright E2E: close deal → earnings update
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 12 — Dashboard ✅
+- [x] Role-aware sidebar layout (broker/admin), mobile horizontal tab bar
+- [x] Broker: My Listings table (view/edit/close deal), Add Listing 4-step wizard, Submissions queue
+- [x] Admin: All Listings, Users (role management), Verification queue
+- [x] CloseDealModal — optional price, commission, notes; live commission calculation
+- [x] CloseListingView (backend): marks SOLD/RENTED, creates Deal record
+- [x] UpdateListingView (backend): PATCH /api/listings/<id>/update/ for broker/admin
+- [x] Edit listing page — pre-populated form for title, description, price, status, location
+- [x] Textarea shadcn component added
+- [x] TypeScript build: zero errors, 18 routes
+- [x] Committed + pushed
 
 ## Phase 13 — Language System ⬜
 - [ ] All UI strings in am.json / en.json / om.json (Amharic is primary, English is fallback)

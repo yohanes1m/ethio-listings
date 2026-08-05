@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import { useLanguageStore, type Language } from '@/store/languageStore'
 import { useLogout } from '@/hooks/useAuth'
+import { useTranslation } from '@/lib/useTranslation'
 import { Button } from '@/components/ui/button'
 
 const LANGS: { code: Language; label: string }[] = [
@@ -16,6 +17,7 @@ export function Header() {
   const { isAuthenticated, user } = useAuthStore()
   const { language, setLanguage } = useLanguageStore()
   const logout = useLogout()
+  const { t } = useTranslation()
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -54,18 +56,18 @@ export function Header() {
                 </Button>
               </Link>
               <Button variant="outline" size="sm" onClick={logout}>
-                Sign Out
+                {t('nav.logout')}
               </Button>
             </>
           ) : (
             <>
               <Link href="/auth/login">
                 <Button variant="ghost" size="sm">
-                  Sign In
+                  {t('nav.login')}
                 </Button>
               </Link>
               <Link href="/auth/register">
-                <Button size="sm">Register</Button>
+                <Button size="sm">{t('nav.register')}</Button>
               </Link>
             </>
           )}

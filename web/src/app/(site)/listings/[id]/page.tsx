@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useListing } from '@/hooks/useListings'
 import { useToggleFavorite } from '@/hooks/useFavorites'
 import { useLanguageStore } from '@/store/languageStore'
+import { useTranslation } from '@/lib/useTranslation'
 import {
   getLocalizedTitle,
   getLocalizedDescription,
@@ -23,6 +24,7 @@ export default function ListingDetailPage() {
   const { data: listing, isLoading } = useListing(id)
   const { language } = useLanguageStore()
   const { isSaved, toggle } = useToggleFavorite(id)
+  const { t } = useTranslation()
   const [activeImage, setActiveImage] = useState(0)
 
   if (isLoading) {
@@ -99,16 +101,16 @@ export default function ListingDetailPage() {
           {/* Badges */}
           <div className="flex flex-wrap gap-2">
             <Badge variant={listing.listing_type === 'SALE' ? 'default' : 'secondary'}>
-              {listing.listing_type === 'SALE' ? 'For Sale' : 'For Rent'}
+              {listing.listing_type === 'SALE' ? t('listing.sale') : t('listing.rent')}
             </Badge>
             {listing.is_verified && (
               <Badge variant="outline" className="text-emerald-600 border-emerald-200">
-                <CheckCircle className="w-3 h-3 mr-1" /> Verified
+                <CheckCircle className="w-3 h-3 mr-1" /> {t('listing.verified')}
               </Badge>
             )}
             {listing.is_featured && (
               <Badge variant="outline" className="text-amber-600 border-amber-200">
-                Featured
+                {t('listing.featured')}
               </Badge>
             )}
           </div>
@@ -118,7 +120,7 @@ export default function ListingDetailPage() {
             <h1 className="text-2xl font-bold leading-tight">{title}</h1>
             <p className="text-2xl font-bold text-primary mt-2 tabular-nums">{price}</p>
             {listing.price_negotiable && (
-              <p className="text-sm text-muted-foreground">Price negotiable</p>
+              <p className="text-sm text-muted-foreground">{t('listing.negotiable')}</p>
             )}
           </div>
 
@@ -140,7 +142,7 @@ export default function ListingDetailPage() {
           {/* Description */}
           {description && (
             <div>
-              <h2 className="font-semibold mb-2">Description</h2>
+              <h2 className="font-semibold mb-2">{t('listing.description')}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {description}
               </p>
@@ -154,7 +156,7 @@ export default function ListingDetailPage() {
         {/* Right — broker contact */}
         <div className="space-y-4">
           <div className="rounded-xl border border-border p-5 sticky top-20">
-            <h2 className="font-semibold mb-4">Contact Broker</h2>
+            <h2 className="font-semibold mb-4">{t('listing.contact_broker')}</h2>
 
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
@@ -176,7 +178,7 @@ export default function ListingDetailPage() {
                 >
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    WhatsApp
+                    {t('listing.whatsapp')}
                   </Button>
                 </a>
               )}
@@ -189,7 +191,7 @@ export default function ListingDetailPage() {
                 >
                   <Button variant="outline" className="w-full">
                     <Send className="w-4 h-4 mr-2" />
-                    Telegram
+                    {t('listing.telegram')}
                   </Button>
                 </a>
               )}
@@ -207,6 +209,7 @@ export default function ListingDetailPage() {
 }
 
 function SpecTable({ listing }: { listing: ReturnType<typeof useListing>['data'] }) {
+  const { t } = useTranslation()
   if (!listing) return null
 
   const rows: [string, string | number | boolean | null | undefined][] = []
@@ -263,7 +266,7 @@ function SpecTable({ listing }: { listing: ReturnType<typeof useListing>['data']
 
   return (
     <div>
-      <h2 className="font-semibold mb-3">Specifications</h2>
+      <h2 className="font-semibold mb-3">{t('listing.specifications')}</h2>
       <div className="rounded-xl border border-border divide-y divide-border">
         {visible.map(([label, value]) => (
           <div key={label} className="flex justify-between px-4 py-2.5 text-sm">

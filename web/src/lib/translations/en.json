@@ -64,7 +64,9 @@
     "area": "Area",
     "per_month": "/month",
     "per_year": "/year",
-    "negotiable": "Price Negotiable"
+    "negotiable": "Price Negotiable",
+    "description": "Description",
+    "specifications": "Specifications"
   },
   "auth": {
     "login_title": "Sign In",

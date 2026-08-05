@@ -6,6 +6,7 @@ import { Heart, CheckCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useLanguageStore } from '@/store/languageStore'
 import { useToggleFavorite } from '@/hooks/useFavorites'
+import { useTranslation } from '@/lib/useTranslation'
 import { getLocalizedTitle, getMainImage, formatPrice, whatsAppLink } from '@/lib/listingUtils'
 import type { Listing } from '@/types/listing'
 
@@ -16,6 +17,7 @@ interface Props {
 export function ListingCard({ listing }: Props) {
   const { language } = useLanguageStore()
   const { isSaved, toggle, isPending } = useToggleFavorite(listing.id)
+  const { t } = useTranslation()
   const title = getLocalizedTitle(listing, language)
   const mainImage = getMainImage(listing)
   const price = formatPrice(listing.price, listing.price_unit)
@@ -44,12 +46,12 @@ export function ListingCard({ listing }: Props) {
             variant={listing.listing_type === 'SALE' ? 'default' : 'secondary'}
             className="text-[10px] px-2 py-0.5"
           >
-            {listing.listing_type === 'SALE' ? 'For Sale' : 'For Rent'}
+            {listing.listing_type === 'SALE' ? t('listing.sale') : t('listing.rent')}
           </Badge>
           {listing.is_verified && (
             <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-200 text-[10px] px-2 py-0.5">
               <CheckCircle className="w-2.5 h-2.5 mr-1" />
-              Verified
+              {t('listing.verified')}
             </Badge>
           )}
         </div>
@@ -75,7 +77,7 @@ export function ListingCard({ listing }: Props) {
         {/* Price */}
         <p className="text-lg font-bold tabular-nums leading-tight">{price}</p>
         {listing.price_negotiable && (
-          <p className="text-[10px] text-muted-foreground -mt-0.5">Negotiable</p>
+          <p className="text-[10px] text-muted-foreground -mt-0.5">{t('listing.negotiable')}</p>
         )}
 
         {/* Title */}
@@ -104,7 +106,7 @@ export function ListingCard({ listing }: Props) {
             className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950 dark:border-emerald-800 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-medium py-1.5 transition-colors"
           >
             <WhatsAppIcon />
-            WhatsApp
+            {t('listing.whatsapp')}
           </a>
         </div>
       )}

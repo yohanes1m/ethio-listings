@@ -7,33 +7,19 @@ import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ListingGrid } from '@/components/listings/ListingGrid'
 import { useFeaturedListings, usePlatformStats } from '@/hooks/useListings'
+import { useTranslation } from '@/lib/useTranslation'
 
 const CATEGORIES = [
-  { key: 'houses', label: 'ቤቶች', labelEn: 'Houses', emoji: '🏠' },
-  { key: 'lands', label: 'መሬቶች', labelEn: 'Land', emoji: '🌿' },
-  { key: 'cars', label: 'መኪናዎች', labelEn: 'Cars', emoji: '🚗' },
-  { key: 'machines', label: 'ማሽኖች', labelEn: 'Machines', emoji: '⚙️' },
+  { key: 'houses', i18n: 'home.categories.houses', emoji: '🏠' },
+  { key: 'lands', i18n: 'home.categories.land', emoji: '🌿' },
+  { key: 'cars', i18n: 'home.categories.cars', emoji: '🚗' },
+  { key: 'machines', i18n: 'home.categories.machines', emoji: '⚙️' },
 ]
 
-const HOW_IT_WORKS = [
-  {
-    step: '01',
-    title: 'Submit Your Property',
-    titleAm: 'ንብረትዎን ያስረክቡ',
-    desc: 'Fill in the details and submit a listing request. Free, takes 2 minutes.',
-  },
-  {
-    step: '02',
-    title: 'A Broker Contacts You',
-    titleAm: 'ደላላ ያገኛሉ',
-    desc: 'Our professional brokers review your request, verify details, and reach out.',
-  },
-  {
-    step: '03',
-    title: 'Your Listing Goes Live',
-    titleAm: 'ዝርዝርዎ ይታተማል',
-    desc: 'Once approved, your property is published and buyers start seeing it.',
-  },
+const HOW_IT_WORKS_KEYS = [
+  { step: '01', titleKey: 'home.steps.submit.title', descKey: 'home.steps.submit.description' },
+  { step: '02', titleKey: 'home.steps.broker.title', descKey: 'home.steps.broker.description' },
+  { step: '03', titleKey: 'home.steps.published.title', descKey: 'home.steps.published.description' },
 ]
 
 export default function HomePage() {
@@ -42,6 +28,7 @@ export default function HomePage() {
   const router = useRouter()
   const { data: featured, isLoading: featuredLoading } = useFeaturedListings()
   const { data: stats } = usePlatformStats()
+  const { t } = useTranslation()
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -54,10 +41,10 @@ export default function HomePage() {
       <section className="bg-gradient-to-b from-amber-50 to-background dark:from-amber-950/20 dark:to-background py-16 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
-            ቀጣዩን ንብረትዎን ይፈልጉ
+            {t('home.hero_title')}
           </h1>
           <p className="text-muted-foreground mb-8 text-sm">
-            Find your next property in Ethiopia
+            {t('home.hero_subtitle')}
           </p>
 
           {/* Search box */}
@@ -67,7 +54,7 @@ export default function HomePage() {
           >
             {/* Category tabs */}
             <div className="flex gap-1 mb-2 px-1">
-              {CATEGORIES.map(({ key, emoji, labelEn }) => (
+              {CATEGORIES.map(({ key, emoji, i18n }) => (
                 <button
                   key={key}
                   type="button"
@@ -79,7 +66,7 @@ export default function HomePage() {
                   }`}
                 >
                   <span>{emoji}</span>
-                  <span className="hidden sm:inline">{labelEn}</span>
+                  <span className="hidden sm:inline">{t(i18n)}</span>
                 </button>
               ))}
             </div>
@@ -92,12 +79,12 @@ export default function HomePage() {
                   type="text"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search location, title, or type..."
+                  placeholder={t('home.search_placeholder')}
                   className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <Button type="submit" className="shrink-0">
-                ፈልግ
+                {t('home.search_button')}
               </Button>
             </div>
           </form>
@@ -108,16 +95,16 @@ export default function HomePage() {
       <section className="border-b border-border bg-muted/40 py-6 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           {[
-            { label: 'Active Listings', value: stats?.active_listings },
-            { label: 'Brokers', value: stats?.brokers },
-            { label: 'Regions', value: stats?.regions_covered },
-            { label: 'Deals Closed', value: stats?.deals_closed },
-          ].map(({ label, value }) => (
-            <div key={label}>
+            { labelKey: 'home.stats.listings', value: stats?.active_listings },
+            { labelKey: 'home.stats.brokers', value: stats?.brokers },
+            { labelKey: 'home.stats.regions', value: stats?.regions_covered },
+            { labelKey: 'home.stats.deals', value: stats?.deals_closed },
+          ].map(({ labelKey, value }) => (
+            <div key={labelKey}>
               <p className="text-2xl font-bold tabular-nums text-primary">
                 {value != null ? value.toLocaleString() + '+' : '—'}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t(labelKey)}</p>
             </div>
           ))}
         </div>
@@ -125,15 +112,15 @@ export default function HomePage() {
 
       {/* ── Featured listings ── */}
       <section className="max-w-6xl mx-auto py-12 px-4">
-        <h2 className="text-xl font-semibold mb-6">ተመራጭ ዝርዝሮች</h2>
+        <h2 className="text-xl font-semibold mb-6">{t('home.featured_title')}</h2>
         <ListingGrid
           listings={featured ?? []}
           isLoading={featuredLoading}
-          emptyMessage="No featured listings yet."
+          emptyMessage={t('common.no_results')}
         />
         <div className="mt-8 text-center">
           <Link href="/browse/houses">
-            <Button variant="outline">View all listings</Button>
+            <Button variant="outline">{t('nav.browse')} →</Button>
           </Link>
         </div>
       </section>
@@ -141,15 +128,15 @@ export default function HomePage() {
       {/* ── How it works ── */}
       <section className="bg-muted/40 border-t border-border py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl font-semibold text-center mb-10">እንዴት ይሠራል</h2>
+          <h2 className="text-xl font-semibold text-center mb-10">{t('home.how_it_works_title')}</h2>
           <div className="grid sm:grid-cols-3 gap-8">
-            {HOW_IT_WORKS.map(({ step, title, titleAm, desc }) => (
+            {HOW_IT_WORKS_KEYS.map(({ step, titleKey, descKey }) => (
               <div key={step} className="text-center">
                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center mx-auto mb-3">
                   {step}
                 </div>
-                <h3 className="font-semibold mb-1">{titleAm}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+                <h3 className="font-semibold mb-1">{t(titleKey)}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t(descKey)}</p>
               </div>
             ))}
           </div>
@@ -158,12 +145,12 @@ export default function HomePage() {
 
       {/* ── CTA ── */}
       <section className="py-12 px-4 text-center">
-        <h2 className="text-xl font-semibold mb-2">ንብረትዎን ይዘርዝሩ</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('home.cta_title')}</h2>
         <p className="text-muted-foreground text-sm mb-6">
-          Contact a broker today — free, fast, professional.
+          {t('home.cta_subtitle')}
         </p>
         <Link href="/submit">
-          <Button size="lg">Get Started →</Button>
+          <Button size="lg">{t('home.cta_button')} →</Button>
         </Link>
       </section>
     </div>

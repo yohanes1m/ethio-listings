@@ -64,7 +64,9 @@
     "area": "ስፋት",
     "per_month": "/ወር",
     "per_year": "/ዓመት",
-    "negotiable": "ዋጋ ሊደራደር ይቻላል"
+    "negotiable": "ዋጋ ሊደራደር ይቻላል",
+    "description": "መግለጫ",
+    "specifications": "ዝርዝር መረጃ"
   },
   "auth": {
     "login_title": "ግባ",
