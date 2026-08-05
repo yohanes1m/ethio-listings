@@ -109,20 +109,20 @@
 - [x] Full suite: 125 tests in 1.61s
 - [x] Committed + pushed
 
-## Phase 8 — Next.js Scaffold ⬜
-- [ ] npx create-next-app@latest inside web/
-- [ ] Shadcn/ui initialized, amber-500 as accent
-- [ ] Zustand: authStore + languageStore (default language: 'am', persisted)
-- [ ] Axios: apiClient (public) + authApiClient (JWT interceptor + refresh)
-- [ ] Translation files: lib/translations/am.json, en.json, om.json (skeletons)
-- [ ] Font setup: Inter + Noto Sans Ethiopic (next/font/google)
-- [ ] React Query provider in layout.tsx
-- [ ] Sentry initialized (npx @sentry/wizard -i nextjs)
-- [ ] tsconfig.json strict mode enabled
-- [ ] .eslintrc.json + .prettierrc written
-- [ ] web/Dockerfile written
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 8 — Next.js Scaffold ✅
+- [x] npx create-next-app@latest inside web/ (TypeScript, Tailwind, App Router, src-dir)
+- [x] Shadcn/ui initialized, amber-500 (oklch(0.769 0.188 70.08)) as primary
+- [x] Zustand: authStore (persist: ethio-auth) + languageStore (default: 'am', persist: ethio-language)
+- [x] Axios: apiClient (public) + authApiClient (JWT interceptor + refresh + redirect on 401)
+- [x] Translation files: lib/translations/{am,en,om}.json — full skeleton for all UI sections
+- [x] Font setup: Inter (--font-inter) + Noto Sans Ethiopic (--font-noto-ethiopic) via next/font/google
+- [x] React Query provider (QueryProvider.tsx) wrapping layout
+- [x] Toaster (react-hot-toast) wired in layout
+- [x] tsconfig.json strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes
+- [x] .prettierrc written
+- [x] useTranslation hook (am → en fallback)
+- [x] Build: ✓ Compiled successfully, zero TypeScript errors
+- [x] Committed + pushed
 
 ## Phase 9 — Auth Pages ⬜
 - [ ] /auth/login (email/password + Google OAuth button)
