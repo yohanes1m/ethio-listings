@@ -19,7 +19,6 @@ export function ListingCard({ listing }: Props) {
   const title = getLocalizedTitle(listing, language)
   const mainImage = getMainImage(listing)
   const price = formatPrice(listing.price, listing.price_unit)
-  const broker = listing.user.broker_profile
 
   return (
     <article className="group rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow">
@@ -96,10 +95,10 @@ export function ListingCard({ listing }: Props) {
       </Link>
 
       {/* WhatsApp */}
-      {broker?.whatsapp_phone && (
+      {listing.broker_whatsapp && (
         <div className="px-3 pb-3">
           <a
-            href={whatsAppLink(broker.whatsapp_phone, title)}
+            href={whatsAppLink(listing.broker_whatsapp, title)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-1.5 w-full rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950 dark:border-emerald-800 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-medium py-1.5 transition-colors"

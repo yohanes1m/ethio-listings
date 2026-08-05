@@ -47,8 +47,7 @@ export default function ListingDetailPage() {
   const title = getLocalizedTitle(listing, language)
   const description = getLocalizedDescription(listing, language)
   const price = formatPrice(listing.price, listing.price_unit)
-  const broker = listing.user.broker_profile
-  const images = listing.media.sort((a, b) => a.order - b.order)
+  const images = (listing.media ?? []).sort((a, b) => a.order - b.order)
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -159,20 +158,18 @@ export default function ListingDetailPage() {
 
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                {listing.user.first_name[0]}
+                B
               </div>
               <div>
-                <p className="font-medium text-sm">
-                  {listing.user.first_name} {listing.user.last_name}
-                </p>
-                <p className="text-xs text-muted-foreground">Broker</p>
+                <p className="font-medium text-sm">Broker</p>
+                <p className="text-xs text-muted-foreground">EthioListings</p>
               </div>
             </div>
 
             <div className="space-y-2">
-              {broker?.whatsapp_phone && (
+              {listing.broker_whatsapp && (
                 <a
-                  href={whatsAppLink(broker.whatsapp_phone, title)}
+                  href={whatsAppLink(listing.broker_whatsapp, title)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full"
@@ -183,9 +180,9 @@ export default function ListingDetailPage() {
                   </Button>
                 </a>
               )}
-              {broker?.telegram_username && (
+              {listing.broker_telegram && (
                 <a
-                  href={telegramLink(broker.telegram_username)}
+                  href={telegramLink(listing.broker_telegram)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full"
@@ -196,7 +193,7 @@ export default function ListingDetailPage() {
                   </Button>
                 </a>
               )}
-              {!broker?.whatsapp_phone && !broker?.telegram_username && (
+              {!listing.broker_whatsapp && !listing.broker_telegram && (
                 <p className="text-xs text-muted-foreground text-center py-2">
                   Contact info not available
                 </p>

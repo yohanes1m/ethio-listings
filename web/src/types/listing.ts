@@ -85,7 +85,8 @@ export interface Listing {
   is_verified: boolean
   is_featured: boolean
   view_count: number
-  user: ListingUser
+  broker_whatsapp: string | null
+  broker_telegram: string | null
   location?: Location | null
   media: ListingMedia[]
   house_details?: HouseDetails | null
