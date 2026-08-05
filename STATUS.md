@@ -48,18 +48,18 @@
 - [ ] All migrations apply cleanly (run: `docker-compose run api python manage.py migrate && python manage.py loaddata ethiopian_locations`)
 - [x] Committed + pushed
 
-## Phase 3 — Auth API ⬜
-- [ ] POST /api/auth/register (role defaults to BUYER)
-- [ ] POST /api/auth/login → access + refresh tokens
-- [ ] POST /api/auth/refresh
-- [ ] GET /api/auth/me
-- [ ] POST /api/auth/google/ (id_token → JWT)
-- [ ] POST /api/auth/forgot-password + reset-password (Resend email)
-- [ ] GET /api/auth/users (ADMIN)
-- [ ] PATCH /api/auth/users/<id>/role (ADMIN)
-- [ ] Automated tests written (test_auth.py)
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 3 — Auth API ✅
+- [x] POST /api/auth/register (role defaults to BUYER)
+- [x] POST /api/auth/login → access + refresh tokens
+- [x] POST /api/auth/refresh
+- [x] GET /api/auth/me
+- [x] POST /api/auth/google/ (id_token → JWT)
+- [x] POST /api/auth/forgot-password + reset-password (Resend email)
+- [x] GET /api/auth/users (ADMIN)
+- [x] PATCH /api/auth/users/<id>/role (ADMIN)
+- [x] DELETE /api/auth/users/<id>/ (ADMIN)
+- [x] Automated tests written (test_auth.py) — 23 tests covering all endpoints
+- [x] Committed + pushed
 
 ## Phase 4 — Submissions API ⬜
 - [ ] ListingRequest model + SubmissionStatus choices

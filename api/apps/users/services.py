@@ -5,6 +5,8 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.utils import timezone
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token as google_id_token
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -14,8 +16,7 @@ def _tokens_for_user(user):
 
 
 def google_authenticate(id_token: str) -> dict:
-    from google.oauth2 import id_token as google_id_token
-    from google.auth.transport import requests as google_requests
+    from rest_framework.exceptions import AuthenticationFailed
     from .models import User
 
     try:
@@ -23,7 +24,6 @@ def google_authenticate(id_token: str) -> dict:
             id_token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
         )
     except Exception as exc:
-        from rest_framework.exceptions import AuthenticationFailed
         raise AuthenticationFailed(f"Invalid Google token: {exc}")
 
     google_id = idinfo["sub"]
