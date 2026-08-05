@@ -79,6 +79,20 @@ export function useUpdateListing() {
   })
 }
 
+export function useUploadMedia() {
+  return useMutation({
+    mutationFn: ({ listingId, file }: { listingId: string; file: File }) => {
+      const fd = new FormData()
+      fd.append('file', file)
+      return authApiClient
+        .post(`/media/listings/${listingId}/media/`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        .then((r) => r.data)
+    },
+  })
+}
+
 export function useCloseDeal() {
   const qc = useQueryClient()
   return useMutation({

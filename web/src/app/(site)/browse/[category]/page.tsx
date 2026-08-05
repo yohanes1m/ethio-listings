@@ -6,6 +6,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { LayoutGrid, Map } from 'lucide-react'
 import { ListingGrid } from '@/components/listings/ListingGrid'
+import { Pagination } from '@/components/ui/pagination'
 import { usePublicListings, useMapPins } from '@/hooks/useListings'
 import { useRegions } from '@/hooks/useLocations'
 import {
@@ -32,6 +33,8 @@ const CATEGORY_MAP: Record<Category, string> = {
   machines: 'MACHINE',
 }
 
+const PAGE_SIZE = 20
+
 export default function BrowsePage() {
   const params = useParams<{ category: string }>()
   const searchParams = useSearchParams()
@@ -41,6 +44,7 @@ export default function BrowsePage() {
   const [view, setView] = useState<'grid' | 'map'>('grid')
   const [listingType, setListingType] = useState<string>('ALL')
   const [region, setRegion] = useState<string>('ALL')
+  const [page, setPage] = useState(1)
 
   const { data: regionsData } = useRegions()
   const regions = regionsData ?? []
@@ -51,11 +55,19 @@ export default function BrowsePage() {
     ...(listingType !== 'ALL' ? { listing_type: listingType } : {}),
     ...(region !== 'ALL' ? { region } : {}),
     ...(qParam ? { q: qParam } : {}),
+    page,
   })
 
   const { data: mapPins } = useMapPins(view === 'map' ? apiCategory : undefined)
 
   const listings = data?.results ?? []
+
+  function handleFilterChange(setter: (v: string) => void) {
+    return (v: string) => {
+      setter(v)
+      setPage(1)
+    }
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -76,7 +88,7 @@ export default function BrowsePage() {
 
       {/* Filters + view toggle */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <Select value={listingType} onValueChange={(v) => { if (v) setListingType(v) }}>
+        <Select value={listingType} onValueChange={(v) => { if (v) handleFilterChange(setListingType)(v) }}>
           <SelectTrigger className="w-36">
             <SelectValue placeholder="Type" />
           </SelectTrigger>
@@ -87,7 +99,7 @@ export default function BrowsePage() {
           </SelectContent>
         </Select>
 
-        <Select value={region} onValueChange={(v) => { if (v) setRegion(v) }}>
+        <Select value={region} onValueChange={(v) => { if (v) handleFilterChange(setRegion)(v) }}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Region" />
           </SelectTrigger>
@@ -100,7 +112,15 @@ export default function BrowsePage() {
         </Select>
 
         {(listingType !== 'ALL' || region !== 'ALL') && (
-          <Button variant="ghost" size="sm" onClick={() => { setListingType('ALL'); setRegion('ALL') }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setListingType('ALL')
+              setRegion('ALL')
+              setPage(1)
+            }}
+          >
             Clear filters
           </Button>
         )}
@@ -130,15 +150,33 @@ export default function BrowsePage() {
 
       {/* Count */}
       {!isLoading && data && (
-        <p className="text-sm text-muted-foreground mb-4">{data.count} listings</p>
+        <p className="text-sm text-muted-foreground mb-4">
+          {data.count} listing{data.count !== 1 ? 's' : ''}
+          {data.count > PAGE_SIZE && (
+            <span> — page {page} of {Math.ceil(data.count / PAGE_SIZE)}</span>
+          )}
+        </p>
       )}
 
       {view === 'grid' ? (
-        <ListingGrid
-          listings={listings}
-          isLoading={isLoading}
-          emptyMessage={`No ${category} listings found. Try removing filters.`}
-        />
+        <>
+          <ListingGrid
+            listings={listings}
+            isLoading={isLoading}
+            emptyMessage={`No ${category} listings found. Try removing filters.`}
+          />
+          {data && (
+            <Pagination
+              page={page}
+              count={data.count}
+              pageSize={PAGE_SIZE}
+              onChange={(p) => {
+                setPage(p)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+            />
+          )}
+        </>
       ) : (
         <ListingMap pins={mapPins ?? []} />
       )}
