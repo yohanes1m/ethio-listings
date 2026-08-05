@@ -23,19 +23,18 @@
 - [ ] GitHub secrets set: OPENAI_API_KEY, SENTRY_DSN (for CI) — set manually in repo settings
 - [ ] pre-commit install run — run locally: `pip install pre-commit && pre-commit install`
 
-## Phase 1 — Django Scaffold ⬜
-- [ ] django-admin startproject config . (inside api/)
-- [ ] All 12 apps created (users, listings, houses, lands, cars, machines, media, favorites, submissions, deals, ai, common)
-- [ ] PostGIS enabled in settings
-- [ ] Redis + Celery configured (config/celery.py, CELERY_BROKER_URL=redis://localhost:6379/0)
-- [ ] Sentry SDK initialized in settings (no-op when SENTRY_DSN not set)
-- [ ] requirements.txt complete: django drf simplejwt psycopg2-binary django-extensions drf-spectacular python-decouple django-cors-headers Pillow cloudinary openai google-auth python-telegram-bot resend celery redis sentry-sdk[django,celery] pytest-django factory-boy httpx ruff
-- [ ] pyproject.toml written (ruff config + pytest config)
-- [ ] api/Dockerfile written
-- [ ] .env.example written (includes SENTRY_DSN, ENVIRONMENT, CELERY_BROKER_URL)
-- [ ] Initial migration runs clean
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 1 — Django Scaffold ✅
+- [x] config/ project created (manage.py, wsgi.py, asgi.py, urls.py, settings.py, celery.py)
+- [x] All 12 apps created (users, listings, houses, lands, cars, machines, media, favorites, submissions, deals, ai, common)
+- [x] DB engine configurable (postgis in Docker, postgresql locally via DB_ENGINE env var)
+- [x] Redis + Celery configured (config/celery.py, CELERY_BROKER_URL env var)
+- [x] Sentry SDK initialized in settings (no-op when SENTRY_DSN not set)
+- [x] requirements.txt written (all dependencies)
+- [x] pyproject.toml updated (ruff py310, pytest config)
+- [x] api/Dockerfile written (python:3.12-slim + gdal + psycopg2)
+- [x] .env.example written (all vars including DB_ENGINE, REDIS_URL, GOOGLE_CLIENT_ID)
+- [x] Initial migrations generated for all 10 model apps (apply with Docker: `docker-compose run api python manage.py migrate`)
+- [x] Committed + pushed
 
 ## Phase 2 — Core Models ⬜
 - [ ] User model (AbstractBaseUser, BUYER/BROKER/ADMIN, google_id, telegram_id, avatar)

@@ -1,4 +1,5 @@
 FROM python:3.12-slim
+# Matches Django 5.2 LTS + latest Python; local dev uses system Python 3.10
 
 RUN apt-get update && apt-get install -y \
     libpq-dev \
