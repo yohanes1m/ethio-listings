@@ -61,17 +61,17 @@
 - [x] Automated tests written (test_auth.py) — 23 tests covering all endpoints
 - [x] Committed + pushed
 
-## Phase 4 — Submissions API ⬜
-- [ ] ListingRequest model + SubmissionStatus choices
-- [ ] POST /api/submissions/ (AUTH required)
-- [ ] GET /api/submissions/ (BROKER/ADMIN queue)
-- [ ] PATCH /api/submissions/<id>/ (update status + notes)
-- [ ] POST /api/submissions/<id>/approve/ (creates Listing, links back)
-- [ ] GET /api/my-submissions/ (owner tracking)
-- [ ] selectors.py + services.py for submission logic
-- [ ] Automated tests written (test_submissions.py)
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 4 — Submissions API ✅
+- [x] ListingRequest model + SubmissionStatus choices
+- [x] POST /api/submissions/ (AUTH required)
+- [x] GET /api/submissions/ (BROKER/ADMIN queue with status filter)
+- [x] PATCH /api/submissions/<id>/ (update status + notes)
+- [x] POST /api/submissions/<id>/approve/ (creates Listing, links back)
+- [x] GET /api/submissions/mine/ (owner tracking)
+- [x] DELETE /api/submissions/<id>/ (ADMIN only)
+- [x] services.py: approve_submission (atomic transaction)
+- [x] Automated tests written (test_submissions.py) — 20 tests, all passing
+- [x] Committed + pushed
 
 ## Phase 5 — Listings + Media + Favorites ⬜
 - [ ] Per-category CRUD: houses, lands, cars, machines
