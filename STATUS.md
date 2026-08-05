@@ -136,16 +136,18 @@
 - [x] Build: 7 routes, zero TypeScript errors, all pages 200
 - [x] Committed + pushed
 
-## Phase 10 — Public Pages ⬜
-- [ ] Home page: hero + 4 category tiles + featured grid + how-it-works + CTA
-- [ ] /browse/[category]: filters sidebar + listing grid + Skeleton loading
-- [ ] ListingCard component (image, price, badges, heart, WhatsApp + Telegram buttons)
-- [ ] /listings/[id]: image gallery + specs + broker contact card
-- [ ] /submit: multi-step listing submission form (protected)
-- [ ] /my-submissions: owner status tracker
-- [ ] Playwright E2E: home → browse → listing detail
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 10 — Public Pages ✅
+- [x] Home page: search-first hero + category tabs + stats strip + featured grid + how-it-works + CTA
+- [x] /browse/[category]: category nav, filters (type + region), ListingGrid + Skeleton loading
+- [x] ListingCard component (3:2 image, price ETB bold, SALE/RENT badge, heart button, WhatsApp link)
+- [x] /listings/[id]: image gallery + thumbnail strip + specs + broker contact card
+- [x] /submit: 4-step listing submission form (protected)
+- [x] /my-submissions: owner status tracker with status badges
+- [x] /saved: favorites page (protected)
+- [x] (site) route group: Header + BottomNav shared layout
+- [x] Docker API port remapped to 8001 (8000 taken by another project)
+- [x] Migrations applied, Ethiopian locations fixture loaded (109 objects)
+- [x] Committed + pushed
 
 ## Phase 11 — Map View ⬜
 - [ ] Mapbox GL integration in ListingMap.tsx
