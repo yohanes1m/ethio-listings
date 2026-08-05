@@ -1,0 +1,30 @@
+'use client'
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import authApiClient from '@/lib/authApiClient'
+import type { Submission } from '@/types/submission'
+
+export function useMySubmissions() {
+  return useQuery({
+    queryKey: ['submissions', 'mine'],
+    queryFn: () =>
+      authApiClient.get<Submission[]>('/submissions/mine/').then((r) => r.data),
+  })
+}
+
+export function useSubmit() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: Record<string, unknown>) =>
+      authApiClient.post<Submission>('/submissions/', data).then((r) => r.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['submissions'] })
+      toast.success('Listing request submitted!')
+    },
+    onError: () => {
+      toast.error('Submission failed — please try again')
+    },
+  })
+}
