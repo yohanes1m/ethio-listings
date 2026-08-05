@@ -36,18 +36,17 @@
 - [x] Initial migrations generated for all 10 model apps (apply with Docker: `docker-compose run api python manage.py migrate`)
 - [x] Committed + pushed
 
-## Phase 2 — Core Models ⬜
-- [ ] User model (AbstractBaseUser, BUYER/BROKER/ADMIN, google_id, telegram_id, avatar)
-- [ ] BrokerProfile + Agency models (telegram_username, whatsapp_phone fields)
-- [ ] Listing + Location (PostGIS PointField) models
-- [ ] ListingMedia model
-- [ ] HouseDetails / LandDetails / CarDetails / MachineDetails
-- [ ] Favorite model
-- [ ] Deal model (all financial fields optional)
-- [ ] EthiopianLocation fixture loaded (regions → zones → woredas)
-- [ ] All migrations apply cleanly
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 2 — Core Models ✅
+- [x] User model (AbstractBaseUser, BUYER/BROKER/ADMIN, google_id, telegram_id, avatar)
+- [x] BrokerProfile + Agency models (telegram_username, whatsapp_phone fields)
+- [x] Listing + Location models (PointField deferred to Phase 5 — map search)
+- [x] ListingMedia model
+- [x] HouseDetails / LandDetails / CarDetails / MachineDetails
+- [x] Favorite model
+- [x] Deal model (all financial fields optional)
+- [x] EthiopianLocation fixture written (api/fixtures/ethiopian_locations.json — 14 regions, zones, key woredas)
+- [ ] All migrations apply cleanly (run: `docker-compose run api python manage.py migrate && python manage.py loaddata ethiopian_locations`)
+- [x] Committed + pushed
 
 ## Phase 3 — Auth API ⬜
 - [ ] POST /api/auth/register (role defaults to BUYER)

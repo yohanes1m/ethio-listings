@@ -10,7 +10,7 @@ class RegionListView(APIView):
 
     def get(self, request):
         regions = (
-            EthiopianLocation.objects.filter(zone__isnull=True)
+            EthiopianLocation.objects
             .values_list("region", flat=True)
             .distinct()
             .order_by("region")
