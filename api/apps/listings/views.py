@@ -29,7 +29,9 @@ class PublicListingListView(APIView):
             qs = qs.filter(price__gte=price_min)
         if price_max := request.query_params.get("price_max"):
             qs = qs.filter(price__lte=price_max)
-        return Response(ListingSerializer(qs[:100], many=True).data)
+        total = qs.count()
+        data = ListingSerializer(qs[:100], many=True).data
+        return Response({"count": total, "results": data})
 
 
 class FeaturedListingView(APIView):
