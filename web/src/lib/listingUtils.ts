@@ -14,9 +14,10 @@ export function getLocalizedDescription(listing: Listing, lang: Language): strin
 }
 
 export function getMainImage(listing: Listing): string | null {
-  const main = listing.media.find((m) => m.is_main)
+  const media = listing.media ?? []
+  const main = media.find((m) => m.is_main)
   if (main) return main.url
-  return listing.media[0]?.url ?? null
+  return media[0]?.url ?? null
 }
 
 export function formatPrice(price: string | null, priceUnit: string | null): string {

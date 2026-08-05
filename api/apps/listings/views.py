@@ -14,7 +14,7 @@ class PublicListingListView(APIView):
     def get(self, request):
         qs = Listing.objects.filter(status=ListingStatus.ACTIVE).select_related(
             "location", "user"
-        )
+        ).prefetch_related("media")
         if cat := request.query_params.get("category"):
             qs = qs.filter(category=cat)
         if lt := request.query_params.get("listing_type"):
@@ -41,7 +41,7 @@ class FeaturedListingView(APIView):
             return Response(cached)
         qs = Listing.objects.filter(
             status=ListingStatus.ACTIVE, is_featured=True
-        ).select_related("location")[:12]
+        ).select_related("location").prefetch_related("media")[:12]
         data = ListingSerializer(qs, many=True).data
         cache.set("featured_listings", data, 30)
         return Response(data)
@@ -63,7 +63,7 @@ class MyListingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = Listing.objects.filter(user=request.user).select_related("location")
+        qs = Listing.objects.filter(user=request.user).select_related("location").prefetch_related("media")
         return Response(ListingSerializer(qs, many=True).data)
 
 

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from apps.media.serializers import ListingMediaSerializer
+
 from .models import EthiopianLocation, Listing, Location
 
 
@@ -11,6 +13,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class ListingSerializer(serializers.ModelSerializer):
     location = LocationSerializer(read_only=True)
+    media = ListingMediaSerializer(many=True, read_only=True)
     broker_whatsapp = serializers.SerializerMethodField()
     broker_telegram = serializers.SerializerMethodField()
     house_details = serializers.SerializerMethodField()
@@ -26,7 +29,7 @@ class ListingSerializer(serializers.ModelSerializer):
             "description", "description_am", "description_om",
             "price", "price_negotiable", "price_unit",
             "is_verified", "is_featured", "view_count",
-            "location", "broker_whatsapp", "broker_telegram",
+            "location", "media", "broker_whatsapp", "broker_telegram",
             "house_details", "land_details", "car_details", "machine_details",
             "created_at", "updated_at",
         ]
