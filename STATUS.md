@@ -101,12 +101,13 @@
 - [x] Full suite: 114 tests in 1.85s
 - [x] Committed + pushed
 
-## Phase 7 — AI Service ⬜
-- [ ] POST /api/ai/generate-listing/ (6 multilingual fields)
-- [ ] 503 graceful fallback when OPENAI_API_KEY not set
-- [ ] Automated tests with mocked OpenAI (test_ai.py)
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 7 — AI Service ✅
+- [x] POST /api/ai/generate-listing/ (6 multilingual fields)
+- [x] 503 graceful fallback when OPENAI_API_KEY not set
+- [x] OpenAI import moved to module level (patchable in tests)
+- [x] Automated tests written (test_ai.py) — 11 tests, all passing
+- [x] Full suite: 125 tests in 1.61s
+- [x] Committed + pushed
 
 ## Phase 8 — Next.js Scaffold ⬜
 - [ ] npx create-next-app@latest inside web/
