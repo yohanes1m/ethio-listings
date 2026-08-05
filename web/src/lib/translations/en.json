@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "home": "Home",
+    "browse": "Browse",
+    "map": "Map",
+    "saved": "Saved",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero_title": "Find your next property in Ethiopia",
+    "hero_subtitle": "Homes, land, cars, and machines — all in one place",
+    "search_placeholder": "Search location, title, or type...",
+    "search_button": "Search",
+    "categories": {
+      "houses": "Houses",
+      "land": "Land",
+      "cars": "Cars",
+      "machines": "Machines"
+    },
+    "stats": {
+      "listings": "Active Listings",
+      "brokers": "Brokers",
+      "regions": "Regions",
+      "deals": "Deals Closed"
+    },
+    "featured_title": "Featured Listings",
+    "how_it_works_title": "How It Works",
+    "steps": {
+      "submit": {
+        "title": "Submit Your Property",
+        "description": "Fill in the details about your property and submit a request."
+      },
+      "broker": {
+        "title": "A Broker Contacts You",
+        "description": "Our professional brokers review your request and reach out."
+      },
+      "published": {
+        "title": "Your Listing Goes Live",
+        "description": "Once verified, your property is published to the marketplace."
+      }
+    },
+    "cta_title": "List your property",
+    "cta_subtitle": "Contact a broker today",
+    "cta_button": "Get Started"
+  },
+  "listing": {
+    "sale": "For Sale",
+    "rent": "For Rent",
+    "verified": "Verified",
+    "featured": "Featured",
+    "price": "Price",
+    "contact_broker": "Contact Broker",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "save": "Save",
+    "unsave": "Unsaved",
+    "share": "Share",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "area": "Area",
+    "per_month": "/month",
+    "per_year": "/year",
+    "negotiable": "Price Negotiable"
+  },
+  "auth": {
+    "login_title": "Sign In",
+    "register_title": "Create Account",
+    "email": "Email Address",
+    "password": "Password",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "phone": "Phone Number",
+    "login_button": "Sign In",
+    "register_button": "Create Account",
+    "google_button": "Continue with Google",
+    "forgot_password": "Forgot Password?",
+    "reset_password": "Reset Password",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "confirm": "Confirm",
+    "no_results": "No results found",
+    "etb": "ETB"
+  },
+  "submission": {
+    "title": "Submit Your Property",
+    "step_category": "Category",
+    "step_details": "Details",
+    "step_location": "Location",
+    "step_contact": "Contact",
+    "step_review": "Review",
+    "submitted_title": "Request Submitted!",
+    "submitted_message": "A broker will contact you shortly.",
+    "my_submissions": "My Submissions",
+    "status": {
+      "pending": "Pending",
+      "contacted": "Contacted",
+      "approved": "Live",
+      "rejected": "Rejected"
+    }
+  },
+  "dashboard": {
+    "my_listings": "My Listings",
+    "add_listing": "Add Listing",
+    "earnings": "Earnings",
+    "deals": "Deals",
+    "users": "Users",
+    "verifications": "Verifications",
+    "total_commission": "Total Commission",
+    "this_month": "This Month",
+    "generate_ai": "Generate with AI"
+  }
+}

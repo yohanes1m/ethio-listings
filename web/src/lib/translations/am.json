@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "home": "ቤት",
+    "browse": "ዳሰሳ",
+    "map": "ካርታ",
+    "saved": "የተቀመጡ",
+    "profile": "መለያ",
+    "login": "ግባ",
+    "register": "ተመዝገብ",
+    "dashboard": "ዳሽቦርድ",
+    "logout": "ውጣ"
+  },
+  "home": {
+    "hero_title": "ቀጣዩን ንብረትዎን በኢትዮጵያ ይፈልጉ",
+    "hero_subtitle": "ቤቶች፣ ቦታዎች፣ መኪናዎች እና ማሽኖች — ሁሉም በአንድ ቦታ",
+    "search_placeholder": "ቦታ፣ ርዕስ ወይም ዓይነት ይፈልጉ...",
+    "search_button": "ፈልግ",
+    "categories": {
+      "houses": "ቤቶች",
+      "land": "መሬቶች",
+      "cars": "መኪናዎች",
+      "machines": "ማሽኖች"
+    },
+    "stats": {
+      "listings": "ንቁ ዝርዝሮች",
+      "brokers": "ደላሎች",
+      "regions": "ክልሎች",
+      "deals": "የተዘጉ ስምምነቶች"
+    },
+    "featured_title": "ተመራጭ ዝርዝሮች",
+    "how_it_works_title": "እንዴት ይሠራል",
+    "steps": {
+      "submit": {
+        "title": "ንብረትዎን ያስረክቡ",
+        "description": "ስለ ንብረትዎ ዝርዝሮችን ይሙሉ እና ጥያቄ ያስረክቡ።"
+      },
+      "broker": {
+        "title": "ደላላ ያገኛሉ",
+        "description": "ሙያዊ ደላሎቻችን ጥያቄዎን ይገመግሙ እና ያገኛሉ።"
+      },
+      "published": {
+        "title": "ዝርዝርዎ ይታተማል",
+        "description": "ከተረጋገጠ በኋላ ንብረትዎ ወደ ገበያ ይታተማል።"
+      }
+    },
+    "cta_title": "ንብረትዎን ይዘርዝሩ",
+    "cta_subtitle": "ዛሬ ደላላ ያግኙ",
+    "cta_button": "ጀምር"
+  },
+  "listing": {
+    "sale": "ለሽያጭ",
+    "rent": "ለኪራይ",
+    "verified": "የተረጋገጠ",
+    "featured": "ተለይቶ የቀረበ",
+    "price": "ዋጋ",
+    "contact_broker": "ደላላ ያግኙ",
+    "whatsapp": "ዋትሳፕ",
+    "telegram": "ቴሌግራም",
+    "save": "አስቀምጥ",
+    "unsave": "ተወው",
+    "share": "አጋራ",
+    "bedrooms": "መኝታ ቤቶች",
+    "bathrooms": "መታጠቢያ ቤቶች",
+    "area": "ስፋት",
+    "per_month": "/ወር",
+    "per_year": "/ዓመት",
+    "negotiable": "ዋጋ ሊደራደር ይቻላል"
+  },
+  "auth": {
+    "login_title": "ግባ",
+    "register_title": "አካውንት ፍጠር",
+    "email": "ኢሜይል አድራሻ",
+    "password": "የሚስጥር ቃል",
+    "first_name": "የመጀመሪያ ስም",
+    "last_name": "የአባት ስም",
+    "phone": "ስልክ ቁጥር",
+    "login_button": "ግባ",
+    "register_button": "አካውንት ፍጠር",
+    "google_button": "በGoogle ቀጥል",
+    "forgot_password": "የሚስጥር ቃል ረሳህ?",
+    "reset_password": "የሚስጥር ቃል ቀይር",
+    "no_account": "አካውንት የለህም?",
+    "have_account": "ቀደም አካውንት አለህ?"
+  },
+  "common": {
+    "loading": "በመጫን ላይ...",
+    "error": "ስህተት ተፈጠረ",
+    "retry": "እንደገና ሞክር",
+    "cancel": "ሰርዝ",
+    "save": "አስቀምጥ",
+    "delete": "ሰርዝ",
+    "edit": "አርትዕ",
+    "submit": "ስጥ",
+    "back": "ተመለስ",
+    "next": "ቀጥል",
+    "close": "ዝጋ",
+    "confirm": "አረጋግጥ",
+    "no_results": "ምንም ውጤት አልተገኘም",
+    "etb": "ብር"
+  },
+  "submission": {
+    "title": "ንብረትዎን ያስረክቡ",
+    "step_category": "ምድብ",
+    "step_details": "ዝርዝሮች",
+    "step_location": "ቦታ",
+    "step_contact": "ዕውቂያ",
+    "step_review": "ይገምግሙ",
+    "submitted_title": "ጥያቄ ተቀበለ!",
+    "submitted_message": "ደላላ በቅርቡ ያገኛሉ።",
+    "my_submissions": "የኔ ጥያቄዎች",
+    "status": {
+      "pending": "በመጠበቅ ላይ",
+      "contacted": "ተገናኝቷል",
+      "approved": "ንቁ",
+      "rejected": "ተከልክሏል"
+    }
+  },
+  "dashboard": {
+    "my_listings": "የኔ ዝርዝሮች",
+    "add_listing": "ዝርዝር ጨምር",
+    "earnings": "ገቢ",
+    "deals": "ስምምነቶች",
+    "users": "ተጠቃሚዎች",
+    "verifications": "ማረጋገጫዎች",
+    "total_commission": "ጠቅላላ ኮሚሽን",
+    "this_month": "ይህ ወር",
+    "generate_ai": "በAI ፍጠር"
+  }
+}

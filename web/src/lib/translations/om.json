@@ -1,0 +1,129 @@
+{
+  "nav": {
+    "home": "Mana",
+    "browse": "Barbaadi",
+    "map": "Kaartaa",
+    "saved": "Kuufame",
+    "profile": "Profaayilii",
+    "login": "Seeni",
+    "register": "Galmaai",
+    "dashboard": "Daashboordii",
+    "logout": "Ba'i"
+  },
+  "home": {
+    "hero_title": "Qabeenya itti aanu Itoophiyaa keessatti barbaadi",
+    "hero_subtitle": "Mana, lafa, konkolaataa, fi meeshaalee — hundumtuu bakka tokkotti",
+    "search_placeholder": "Bakka, mata duree, ykn gosa barbaadi...",
+    "search_button": "Barbaadi",
+    "categories": {
+      "houses": "Manneen",
+      "land": "Lafti",
+      "cars": "Konkolaataalee",
+      "machines": "Meeshaalee"
+    },
+    "stats": {
+      "listings": "Liistii Hojii Irra Jiran",
+      "brokers": "Daldaltoota",
+      "regions": "Naannolee",
+      "deals": "Hariiroon Cufame"
+    },
+    "featured_title": "Liistii Addaa",
+    "how_it_works_title": "Akkamitti Hojjeta",
+    "steps": {
+      "submit": {
+        "title": "Qabeenya Kee Galchi",
+        "description": "Waa'ee qabeenyaa keetii guuti ergii gaafannoo galchi."
+      },
+      "broker": {
+        "title": "Daldaltoonni Si Argatu",
+        "description": "Daldaltoonni ogeeyyii keenya gaafannoo kee ilaalanii si argatu."
+      },
+      "published": {
+        "title": "Liistiin Kee Maxxanfama",
+        "description": "Erga mirkanaayee booda qabeenya kee gabaa irratti maxxanfama."
+      }
+    },
+    "cta_title": "Qabeenya kee tarreessi",
+    "cta_subtitle": "Har'uma daldaltuu argadhu",
+    "cta_button": "Jalqabi"
+  },
+  "listing": {
+    "sale": "Gurgurtaaf",
+    "rent": "Kiraayfannoof",
+    "verified": "Mirkanaaye",
+    "featured": "Addatti Dhiyaate",
+    "price": "Gatii",
+    "contact_broker": "Daldaltuu Argadhu",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "save": "Kuusi",
+    "unsave": "Haqqi",
+    "share": "Qoodi",
+    "bedrooms": "Kutaa Ciisaa",
+    "bathrooms": "Daandii Dhiqannaa",
+    "area": "Bal'ina",
+    "per_month": "/ji'a",
+    "per_year": "/waggaa",
+    "negotiable": "Gatii Marii Danda'a"
+  },
+  "auth": {
+    "login_title": "Seeni",
+    "register_title": "Herrega Uumi",
+    "email": "Teessoo Imeelii",
+    "password": "Jecha Darbii",
+    "first_name": "Maqaa Duraa",
+    "last_name": "Maqaa Abbaa",
+    "phone": "Lakkoofsa Bilbilaa",
+    "login_button": "Seeni",
+    "register_button": "Herrega Uumi",
+    "google_button": "Google Waliin Itti Fufi",
+    "forgot_password": "Jecha Darbii Irraanfatte?",
+    "reset_password": "Jecha Darbii Haaromsi",
+    "no_account": "Herrega Hin Qabdu?",
+    "have_account": "Herrega Dursaan Qabda?"
+  },
+  "common": {
+    "loading": "Fe'aa jira...",
+    "error": "Dogoggorri uumame",
+    "retry": "Irra Deebi'i Yaalii",
+    "cancel": "Haqi",
+    "save": "Kuusi",
+    "delete": "Haqi",
+    "edit": "Gulaali",
+    "submit": "Galchi",
+    "back": "Duuba",
+    "next": "Itti Fufi",
+    "close": "Cufii",
+    "confirm": "Mirkaneessi",
+    "no_results": "Bu'aa hin argamne",
+    "etb": "Birrii"
+  },
+  "submission": {
+    "title": "Qabeenya Kee Galchi",
+    "step_category": "Gosa",
+    "step_details": "Bal'ina",
+    "step_location": "Bakka",
+    "step_contact": "Quunnamtii",
+    "step_review": "Irra Deebi'i Ilaali",
+    "submitted_title": "Gaafannoon Fudhatame!",
+    "submitted_message": "Daldaltoonni sitti dhiyoo barattaa.",
+    "my_submissions": "Gaafannoo Koo",
+    "status": {
+      "pending": "Eeggachaa Jira",
+      "contacted": "Quunnamtame",
+      "approved": "Hojii Irra Jira",
+      "rejected": "Haaqame"
+    }
+  },
+  "dashboard": {
+    "my_listings": "Liistii Koo",
+    "add_listing": "Liistii Dabali",
+    "earnings": "Galii",
+    "deals": "Hariiroolee",
+    "users": "Fayyadamtoota",
+    "verifications": "Mirkanaa'iinsa",
+    "total_commission": "Komishinii Waligalaa",
+    "this_month": "Ji'a Kana",
+    "generate_ai": "Gargaarsa AI tiin Uumi"
+  }
+}
