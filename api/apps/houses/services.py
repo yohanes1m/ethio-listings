@@ -26,7 +26,7 @@ def update_house_listing(user, pk, data: dict) -> Listing:
     from rest_framework.request import Request
 
     listing = Listing.objects.get(pk=pk, category=ListingCategory.HOUSE)
-    if listing.user != user and user.role not in ("BROKER", "ADMIN"):
+    if listing.user != user and user.role != "ADMIN":
         from rest_framework.exceptions import PermissionDenied
         raise PermissionDenied()
 

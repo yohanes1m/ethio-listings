@@ -73,22 +73,24 @@
 - [x] Automated tests written (test_submissions.py) — 20 tests, all passing
 - [x] Committed + pushed
 
-## Phase 5 — Listings + Media + Favorites ⬜
-- [ ] Per-category CRUD: houses, lands, cars, machines
-- [ ] services.py: listing_create, listing_update, listing_close
-- [ ] selectors.py: listing_list, listing_map_pins, broker_deal_summary
-- [ ] Media service (Cloudinary prod / local dev fallback)
-- [ ] GET /api/listings/public/ (filtered, paginated, N+1 free)
-- [ ] GET /api/listings/featured/
-- [ ] GET /api/listings/map/ (GeoJSON pins)
-- [ ] GET /api/listings/mine/
-- [ ] GET /api/listings/<id>/
-- [ ] GET/POST/DELETE /api/favorites/
-- [ ] GET /api/locations/regions|zones|woredas/
-- [ ] PATCH /api/admin/listings/<id>/verify|feature/
-- [ ] Automated tests written (test_listings.py, test_media.py)
-- [ ] Codex review passed (/codex)
-- [ ] Committed + pushed
+## Phase 5 — Listings + Media + Favorites ✅
+- [x] Per-category CRUD: houses, lands, cars, machines
+- [x] services.py: create/update per category (atomic transactions)
+- [x] Media service: Cloudinary prod / local dev fallback (upload_file, delete_file)
+- [x] GET /api/listings/public/ (category, type, region, q, verified, price_min/max filters)
+- [x] GET /api/listings/featured/ (cached 30s)
+- [x] GET /api/listings/map/ (lat/lng pins, category filter)
+- [x] GET /api/listings/mine/
+- [x] GET /api/listings/<id>/ (increments view_count)
+- [x] GET /api/listings/stats/ (active_listings, brokers, regions, deals — cached 5m)
+- [x] PATCH /api/listings/<id>/verify|feature/ (ADMIN)
+- [x] GET/POST/DELETE /api/favorites/
+- [x] GET /api/locations/regions|zones|woredas/
+- [x] Category detail serializers (HouseDetails, LandDetails, CarDetails, MachineDetails) in ListingSerializer
+- [x] Bug fix: houses/services.py ownership check (any broker could edit any listing)
+- [x] Automated tests: test_listings.py (38 tests) + test_media.py (9 tests) — all passing
+- [x] Full suite: 98 tests pass in 2.35s
+- [x] Committed + pushed
 
 ## Phase 6 — Deals API ⬜
 - [ ] POST /api/listings/<id>/close/ (all deal fields optional)

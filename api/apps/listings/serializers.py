@@ -13,6 +13,10 @@ class ListingSerializer(serializers.ModelSerializer):
     location = LocationSerializer(read_only=True)
     broker_whatsapp = serializers.SerializerMethodField()
     broker_telegram = serializers.SerializerMethodField()
+    house_details = serializers.SerializerMethodField()
+    land_details = serializers.SerializerMethodField()
+    car_details = serializers.SerializerMethodField()
+    machine_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Listing
@@ -23,6 +27,7 @@ class ListingSerializer(serializers.ModelSerializer):
             "price", "price_negotiable", "price_unit",
             "is_verified", "is_featured", "view_count",
             "location", "broker_whatsapp", "broker_telegram",
+            "house_details", "land_details", "car_details", "machine_details",
             "created_at", "updated_at",
         ]
 
@@ -35,6 +40,34 @@ class ListingSerializer(serializers.ModelSerializer):
     def get_broker_telegram(self, obj):
         try:
             return obj.user.broker_profile.telegram_username
+        except Exception:
+            return None
+
+    def get_house_details(self, obj):
+        try:
+            from apps.houses.serializers import HouseDetailsSerializer
+            return HouseDetailsSerializer(obj.house_details).data
+        except Exception:
+            return None
+
+    def get_land_details(self, obj):
+        try:
+            from apps.lands.serializers import LandDetailsSerializer
+            return LandDetailsSerializer(obj.land_details).data
+        except Exception:
+            return None
+
+    def get_car_details(self, obj):
+        try:
+            from apps.cars.serializers import CarDetailsSerializer
+            return CarDetailsSerializer(obj.car_details).data
+        except Exception:
+            return None
+
+    def get_machine_details(self, obj):
+        try:
+            from apps.machines.serializers import MachineDetailsSerializer
+            return MachineDetailsSerializer(obj.machine_details).data
         except Exception:
             return None
 
