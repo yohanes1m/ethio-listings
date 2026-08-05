@@ -1,4 +1,7 @@
+import json
+
 from django.conf import settings
+from openai import OpenAI
 
 
 class AIUnavailableError(Exception):
@@ -8,8 +11,6 @@ class AIUnavailableError(Exception):
 def generate_listing(basic_fields: dict) -> dict:
     if not settings.OPENAI_API_KEY:
         raise AIUnavailableError("AI generation unavailable — fill fields manually.")
-
-    from openai import OpenAI
 
     client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
@@ -28,5 +29,4 @@ def generate_listing(basic_fields: dict) -> dict:
         response_format={"type": "json_object"},
     )
 
-    import json
     return json.loads(response.choices[0].message.content)
