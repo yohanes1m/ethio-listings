@@ -2,9 +2,9 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import authApiClient from '@/lib/authApiClient'
-import type { Listing } from '@/types/listing'
+import type { Listing, PaginatedListings } from '@/types/listing'
 
-interface AdminUser {
+export interface AdminUser {
   id: string
   email: string
   first_name: string
@@ -13,17 +13,47 @@ interface AdminUser {
   created_at: string
 }
 
-export function useAllListings() {
+export interface PaginatedAdminUsers {
+  count: number
+  next: string | null
+  previous: string | null
+  results: AdminUser[]
+}
+
+export interface AdminListingsParams {
+  page?: number
+  q?: string
+  category?: string
+  listing_type?: string
+  status?: string
+  region?: string
+  verified?: string
+  featured?: string
+}
+
+export interface AdminUsersParams {
+  page?: number
+  q?: string
+  role?: string
+}
+
+export function useAllListings(params: AdminListingsParams = {}) {
   return useQuery({
-    queryKey: ['admin', 'listings'],
-    queryFn: () => authApiClient.get<Listing[]>('/listings/admin/').then((r) => r.data),
+    queryKey: ['admin', 'listings', params],
+    queryFn: () =>
+      authApiClient
+        .get<PaginatedListings>('/listings/admin/', { params })
+        .then((r) => r.data),
   })
 }
 
-export function useAdminUsers() {
+export function useAdminUsers(params: AdminUsersParams = {}) {
   return useQuery({
-    queryKey: ['admin', 'users'],
-    queryFn: () => authApiClient.get<AdminUser[]>('/auth/users/').then((r) => r.data),
+    queryKey: ['admin', 'users', params],
+    queryFn: () =>
+      authApiClient
+        .get<PaginatedAdminUsers>('/auth/users/', { params })
+        .then((r) => r.data),
   })
 }
 

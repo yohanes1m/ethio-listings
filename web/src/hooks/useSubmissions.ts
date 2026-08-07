@@ -3,7 +3,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import authApiClient from '@/lib/authApiClient'
-import type { Submission } from '@/types/submission'
+import type { Submission, PaginatedSubmissions } from '@/types/submission'
+
+export interface SubmissionsParams {
+  page?: number
+  status?: string
+  q?: string
+  category?: string
+  listing_type?: string
+  region?: string
+}
 
 export function useMySubmissions() {
   return useQuery({
@@ -13,12 +22,12 @@ export function useMySubmissions() {
   })
 }
 
-export function useSubmissions(status?: string) {
+export function useSubmissions(params: SubmissionsParams = {}) {
   return useQuery({
-    queryKey: ['submissions', 'queue', status],
+    queryKey: ['submissions', 'queue', params],
     queryFn: () =>
       authApiClient
-        .get<Submission[]>('/submissions/', { params: status ? { status } : {} })
+        .get<PaginatedSubmissions>('/submissions/', { params })
         .then((r) => r.data),
   })
 }
