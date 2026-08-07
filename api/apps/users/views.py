@@ -101,12 +101,56 @@ class UserListView(APIView):
 class UserRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    VALID_ROLES = {"BUYER", "BROKER", "ADMIN"}
+
     def patch(self, request, pk):
         from apps.common.permissions import IsAdmin
+        from rest_framework.exceptions import ValidationError, PermissionDenied
         from .serializers import UserSerializer
         IsAdmin().check_object_permissions(request, None)
+
+        new_role = request.data.get("role")
+        if new_role not in self.VALID_ROLES:
+            raise ValidationError({"role": f"Must be one of: {', '.join(sorted(self.VALID_ROLES))}"})
+
+        if str(pk) == str(request.user.pk):
+            raise PermissionDenied("You cannot change your own role.")
+
         user = User.objects.get(pk=pk)
-        user.role = request.data["role"]
+
+        # Prevent removing the last admin
+        if user.role == "ADMIN" and new_role != "ADMIN":
+            admin_count = User.objects.filter(role="ADMIN", is_active=True).count()
+            if admin_count <= 1:
+                raise ValidationError({"detail": "Cannot demote the last active admin."})
+
+        user.role = new_role
+        user.save()
+        return Response(UserSerializer(user).data)
+
+
+class UserSuspendView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        from apps.common.permissions import IsAdmin
+        from rest_framework.exceptions import ValidationError, PermissionDenied
+        from .serializers import UserSerializer
+        IsAdmin().check_object_permissions(request, None)
+
+        if str(pk) == str(request.user.pk):
+            raise PermissionDenied("You cannot suspend your own account.")
+
+        user = User.objects.get(pk=pk)
+        suspending = not user.is_active  # toggling: True = reactivating, False = suspending
+
+        # Prevent suspending the last active admin
+        if user.is_active and user.role == "ADMIN":
+            admin_count = User.objects.filter(role="ADMIN", is_active=True).count()
+            if admin_count <= 1:
+                raise ValidationError({"detail": "Cannot suspend the last active admin."})
+
+        user.is_active = not user.is_active
         user.save()
         return Response(UserSerializer(user).data)
 
@@ -116,6 +160,17 @@ class UserDeleteView(APIView):
 
     def delete(self, request, pk):
         from apps.common.permissions import IsAdmin
+        from rest_framework.exceptions import PermissionDenied, ValidationError
         IsAdmin().check_object_permissions(request, None)
-        User.objects.filter(pk=pk).delete()
+
+        if str(pk) == str(request.user.pk):
+            raise PermissionDenied("You cannot delete your own account.")
+
+        user = User.objects.get(pk=pk)
+        if user.role == "ADMIN":
+            admin_count = User.objects.filter(role="ADMIN", is_active=True).count()
+            if admin_count <= 1:
+                raise ValidationError({"detail": "Cannot delete the last active admin."})
+
+        user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

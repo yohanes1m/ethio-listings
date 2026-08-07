@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,10 +26,13 @@ class DealListView(APIView):
         from apps.common.permissions import IsBrokerOrAdmin
         IsBrokerOrAdmin().check_object_permissions(request, None)
         if request.user.role == "ADMIN":
-            qs = Deal.objects.select_related("listing", "closed_by", "co_broker")
+            qs = Deal.objects.select_related("listing", "closed_by", "co_broker").order_by("-closed_at")
         else:
-            qs = Deal.objects.filter(closed_by=request.user).select_related("listing")
-        return Response(DealSerializer(qs, many=True).data)
+            qs = Deal.objects.filter(closed_by=request.user).select_related("listing", "closed_by").order_by("-closed_at")
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(DealSerializer(page, many=True).data)
 
 
 class DealSummaryView(APIView):

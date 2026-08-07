@@ -92,13 +92,15 @@ class TestDealList:
         client = auth_client(broker)
         r = client.get("/api/deals/")
         assert r.status_code == 200
-        assert len(r.data) == 1
+        assert r.data["count"] == 1
+        assert len(r.data["results"]) == 1
 
     def test_admin_sees_all_deals(self, admin_client, db):
         DealFactory.create_batch(3)
         r = admin_client.get("/api/deals/")
         assert r.status_code == 200
-        assert len(r.data) == 3
+        assert r.data["count"] == 3
+        assert len(r.data["results"]) == 3
 
     def test_buyer_cannot_list_deals(self, buyer_client):
         r = buyer_client.get("/api/deals/")

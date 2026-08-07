@@ -6,7 +6,15 @@ from .models import ListingRequest, SubmissionStatus
 
 @transaction.atomic
 def approve_submission(submission_id: str, broker) -> Listing:
-    submission = ListingRequest.objects.get(pk=submission_id)
+    from rest_framework.exceptions import ValidationError
+    submission = ListingRequest.objects.select_for_update().get(pk=submission_id)
+
+    # Idempotent: return the existing listing if already approved
+    if submission.status == SubmissionStatus.APPROVED and submission.listing_id:
+        return submission.listing
+
+    if submission.status == SubmissionStatus.REJECTED:
+        raise ValidationError({"detail": "Cannot approve a rejected submission."})
     details = submission.details or {}
 
     listing = Listing.objects.create(
