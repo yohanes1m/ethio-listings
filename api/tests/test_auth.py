@@ -237,7 +237,7 @@ class TestUserManagement:
         UserFactory.create_batch(3)
         r = admin_client.get("/api/auth/users/")
         assert r.status_code == 200
-        assert len(r.data) >= 3
+        assert r.data["count"] >= 3
 
     def test_non_admin_cannot_list_users(self, buyer_client):
         r = buyer_client.get("/api/auth/users/")

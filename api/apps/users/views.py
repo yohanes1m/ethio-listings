@@ -1,7 +1,9 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.db.models import Q
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import User
 
@@ -83,8 +85,17 @@ class UserListView(APIView):
         from .serializers import UserSerializer
         from apps.common.permissions import IsAdmin
         IsAdmin().check_object_permissions(request, None)
-        users = User.objects.all().order_by("-created_at")
-        return Response(UserSerializer(users, many=True).data)
+        qs = User.objects.all().order_by("-created_at")
+        if q := request.query_params.get("q"):
+            qs = qs.filter(
+                Q(email__icontains=q) | Q(first_name__icontains=q) | Q(last_name__icontains=q)
+            )
+        if role := request.query_params.get("role"):
+            qs = qs.filter(role=role)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(UserSerializer(page, many=True).data)
 
 
 class UserRoleView(APIView):
