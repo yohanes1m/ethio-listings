@@ -7,9 +7,12 @@ import { useAllListings, useVerifyListing, useFeatureListing } from '@/hooks/use
 import { formatPrice } from '@/lib/listingUtils'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination } from '@/components/ui/pagination'
 import { RoleGuard } from '@/components/auth/RoleGuard'
 import { Badge } from '@/components/ui/badge'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+
+const PAGE_SIZE = 20
 
 type PendingAction = {
   title: string
@@ -28,13 +31,15 @@ export default function VerificationsPage() {
 }
 
 function VerificationsContent() {
-  const { data: all, isLoading } = useAllListings()
   const verify = useVerifyListing()
   const feature = useFeatureListing()
   const [pending, setPending] = useState<PendingAction | null>(null)
+  const [page, setPage] = useState(1)
 
-  const unverified = all?.filter((l) => !l.is_verified && l.status === 'ACTIVE') ?? []
+  const { data, isLoading } = useAllListings({ verified: 'false', status: 'ACTIVE', page })
 
+  const listings = data?.results ?? []
+  const total = data?.count ?? 0
   const isMutating = verify.isPending || feature.isPending
 
   function confirmVerify(l: { id: string; title: string }) {
@@ -63,7 +68,7 @@ function VerificationsContent() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Verification Queue</h1>
-        <p className="text-sm text-muted-foreground">{unverified.length} pending</p>
+        <p className="text-sm text-muted-foreground">{total} pending</p>
       </div>
 
       {isLoading && (
@@ -72,7 +77,7 @@ function VerificationsContent() {
         </div>
       )}
 
-      {!isLoading && unverified.length === 0 && (
+      {!isLoading && total === 0 && (
         <div className="text-center py-20">
           <CheckCircle className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
           <p className="font-medium">All listings are verified!</p>
@@ -80,9 +85,9 @@ function VerificationsContent() {
         </div>
       )}
 
-      {unverified.length > 0 && (
+      {listings.length > 0 && (
         <div className="space-y-3">
-          {unverified.map((l) => (
+          {listings.map((l) => (
             <div key={l.id} className="rounded-xl border border-border p-4 space-y-3 bg-card">
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
@@ -108,18 +113,14 @@ function VerificationsContent() {
                   <Button variant="outline" size="sm" className="text-xs h-7">Preview</Button>
                 </Link>
                 <Button
-                  size="sm"
-                  className="text-xs h-7"
+                  size="sm" className="text-xs h-7"
                   onClick={() => confirmVerify(l)}
                   disabled={isMutating}
                 >
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Verify
+                  <CheckCircle className="w-3 h-3 mr-1" />Verify
                 </Button>
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs h-7"
+                  variant="outline" size="sm" className="text-xs h-7"
                   onClick={() => confirmFeature(l)}
                   disabled={isMutating}
                 >
@@ -132,6 +133,8 @@ function VerificationsContent() {
         </div>
       )}
 
+      <Pagination page={page} count={total} pageSize={PAGE_SIZE} onChange={setPage} />
+
       <ConfirmDialog
         open={!!pending}
         onOpenChange={(open) => { if (!open) setPending(null) }}
@@ -140,10 +143,7 @@ function VerificationsContent() {
         confirmLabel={pending?.confirmLabel ?? 'Confirm'}
         variant={pending?.variant ?? 'default'}
         isLoading={isMutating}
-        onConfirm={() => {
-          pending?.action()
-          setPending(null)
-        }}
+        onConfirm={() => { pending?.action(); setPending(null) }}
       />
     </div>
   )

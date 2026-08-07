@@ -2,17 +2,23 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle, Eye, Star } from 'lucide-react'
+import { CheckCircle, Eye, Star, X } from 'lucide-react'
 import { useAllListings, useVerifyListing, useFeatureListing } from '@/hooks/useAdminListings'
 import { formatPrice } from '@/lib/listingUtils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination } from '@/components/ui/pagination'
 import { RoleGuard } from '@/components/auth/RoleGuard'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
+
+const PAGE_SIZE = 20
 
 type PendingAction = {
-  id: string
   title: string
   description: string
   confirmLabel: string
@@ -29,14 +35,30 @@ export default function AllListingsPage() {
 }
 
 function AllListingsContent() {
-  const { data: listings, isLoading } = useAllListings()
   const verify = useVerifyListing()
   const feature = useFeatureListing()
   const [pending, setPending] = useState<PendingAction | null>(null)
 
+  const [params, setParams] = useState({
+    page: 1, q: '', category: '', listing_type: '', status: '', region: '', verified: '', featured: '',
+  })
+
+  const { data, isLoading } = useAllListings(
+    Object.fromEntries(Object.entries(params).filter(([, v]) => v !== '' && v !== 0))
+  )
+
+  function setParam(key: string, value: string | number) {
+    setParams((p) => ({ ...p, [key]: value, page: 1 }))
+  }
+
+  const hasFilters = Object.entries(params).some(([k, v]) => k !== 'page' && v !== '')
+
+  function clearFilters() {
+    setParams({ page: 1, q: '', category: '', listing_type: '', status: '', region: '', verified: '', featured: '' })
+  }
+
   function confirmVerify(l: { id: string; title: string; is_verified: boolean }) {
     setPending({
-      id: l.id,
       title: l.is_verified ? 'Remove verification?' : 'Verify this listing?',
       description: l.is_verified
         ? `"${l.title}" will lose its verified badge and buyers will no longer see it as verified.`
@@ -49,7 +71,6 @@ function AllListingsContent() {
 
   function confirmFeature(l: { id: string; title: string; is_featured: boolean }) {
     setPending({
-      id: l.id,
       title: l.is_featured ? 'Remove from featured?' : 'Feature this listing?',
       description: l.is_featured
         ? `"${l.title}" will be removed from the featured section on the homepage.`
@@ -61,13 +82,88 @@ function AllListingsContent() {
   }
 
   const isMutating = verify.isPending || feature.isPending
+  const listings = data?.results ?? []
+  const total = data?.count ?? 0
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className="max-w-5xl space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">All Listings</h1>
-        <p className="text-sm text-muted-foreground">{listings?.length ?? 0} total</p>
       </div>
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-2">
+        <Input
+          placeholder="Search listings…"
+          value={params.q}
+          onChange={(e) => setParam('q', e.target.value)}
+          className="h-8 text-xs w-48 min-w-[160px]"
+        />
+        <Select value={params.category} onValueChange={(v) => setParam('category', v)}>
+          <SelectTrigger className="h-8 text-xs w-32">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="HOUSE">House</SelectItem>
+            <SelectItem value="LAND">Land</SelectItem>
+            <SelectItem value="CAR">Car</SelectItem>
+            <SelectItem value="MACHINE">Machine</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={params.listing_type} onValueChange={(v) => setParam('listing_type', v)}>
+          <SelectTrigger className="h-8 text-xs w-28">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="SALE">For Sale</SelectItem>
+            <SelectItem value="RENT">For Rent</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={params.status} onValueChange={(v) => setParam('status', v)}>
+          <SelectTrigger className="h-8 text-xs w-28">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ACTIVE">Active</SelectItem>
+            <SelectItem value="INACTIVE">Inactive</SelectItem>
+            <SelectItem value="SOLD">Sold</SelectItem>
+            <SelectItem value="RENTED">Rented</SelectItem>
+            <SelectItem value="EXPIRED">Expired</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={params.verified} onValueChange={(v) => setParam('verified', v)}>
+          <SelectTrigger className="h-8 text-xs w-32">
+            <SelectValue placeholder="Verified" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Verified only</SelectItem>
+            <SelectItem value="false">Unverified only</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={params.featured} onValueChange={(v) => setParam('featured', v)}>
+          <SelectTrigger className="h-8 text-xs w-32">
+            <SelectValue placeholder="Featured" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Featured only</SelectItem>
+            <SelectItem value="false">Not featured</SelectItem>
+          </SelectContent>
+        </Select>
+        {hasFilters && (
+          <Button variant="ghost" size="sm" className="h-8 text-xs px-2" onClick={clearFilters}>
+            <X className="w-3.5 h-3.5 mr-1" />Clear
+          </Button>
+        )}
+      </div>
+
+      {/* Count */}
+      {!isLoading && (
+        <p className="text-xs text-muted-foreground">
+          {total === 0
+            ? hasFilters ? 'No listings match your filters.' : 'No listings yet.'
+            : `Showing ${Math.min((params.page - 1) * PAGE_SIZE + 1, total)}–${Math.min(params.page * PAGE_SIZE, total)} of ${total}`}
+        </p>
+      )}
 
       {isLoading && (
         <div className="space-y-2">
@@ -75,11 +171,16 @@ function AllListingsContent() {
         </div>
       )}
 
-      {listings && (
+      {!isLoading && listings.length === 0 && (
+        <div className="text-center py-16 text-muted-foreground text-sm">
+          {hasFilters ? 'No listings match your filters.' : 'No listings yet.'}
+        </div>
+      )}
+
+      {listings.length > 0 && (
         <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
           {listings.map((l) => (
             <div key={l.id} className="p-4 bg-card hover:bg-muted/30 transition-colors">
-              {/* Row 1: title + status */}
               <div className="flex items-start gap-2 min-w-0">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -99,25 +200,21 @@ function AllListingsContent() {
                 </Badge>
               </div>
 
-              {/* Row 2: actions */}
               <div className="flex flex-wrap items-center gap-1 mt-3">
                 <Link href={`/listings/${l.id}`} target="_blank">
                   <Button variant="ghost" size="sm" className="h-7 text-xs gap-1">
-                    <Eye className="w-3.5 h-3.5" />
-                    View
+                    <Eye className="w-3.5 h-3.5" />View
                   </Button>
                 </Link>
                 <Button
-                  variant="ghost"
-                  size="sm"
+                  variant="ghost" size="sm"
                   className={`h-7 text-xs ${l.is_verified ? 'text-emerald-700' : ''}`}
                   onClick={() => confirmVerify(l)}
                 >
                   {l.is_verified ? '✓ Verified' : 'Verify'}
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
+                  variant="ghost" size="sm"
                   className={`h-7 text-xs ${l.is_featured ? 'text-amber-600' : ''}`}
                   onClick={() => confirmFeature(l)}
                 >
@@ -129,6 +226,13 @@ function AllListingsContent() {
         </div>
       )}
 
+      <Pagination
+        page={params.page}
+        count={total}
+        pageSize={PAGE_SIZE}
+        onChange={(p) => setParams((prev) => ({ ...prev, page: p }))}
+      />
+
       <ConfirmDialog
         open={!!pending}
         onOpenChange={(open) => { if (!open) setPending(null) }}
@@ -137,10 +241,7 @@ function AllListingsContent() {
         confirmLabel={pending?.confirmLabel ?? 'Confirm'}
         variant={pending?.variant ?? 'default'}
         isLoading={isMutating}
-        onConfirm={() => {
-          pending?.action()
-          setPending(null)
-        }}
+        onConfirm={() => { pending?.action(); setPending(null) }}
       />
     </div>
   )
