@@ -149,7 +149,7 @@ class TestMyListings:
         ListingFactory()  # another broker's listing
         r = broker_client.get("/api/listings/mine/")
         assert r.status_code == 200
-        assert len(r.data) == 1
+        assert r.data["count"] == 1
 
     def test_unauthenticated_cannot_access(self, api_client):
         r = api_client.get("/api/listings/mine/")

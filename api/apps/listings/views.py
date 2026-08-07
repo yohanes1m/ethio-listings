@@ -103,8 +103,24 @@ class MyListingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = Listing.objects.filter(user=request.user).select_related("location").prefetch_related("media")
-        return Response(ListingSerializer(qs, many=True).data)
+        qs = (
+            Listing.objects.filter(user=request.user)
+            .select_related("location")
+            .prefetch_related("media")
+            .order_by("-created_at")
+        )
+        if q := request.query_params.get("q"):
+            qs = qs.filter(Q(title__icontains=q) | Q(title_am__icontains=q))
+        if cat := request.query_params.get("category"):
+            qs = qs.filter(category=cat)
+        if lt := request.query_params.get("listing_type"):
+            qs = qs.filter(listing_type=lt)
+        if status := request.query_params.get("status"):
+            qs = qs.filter(status=status)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(ListingSerializer(page, many=True).data)
 
 
 class AdminListingsView(APIView):
@@ -118,7 +134,24 @@ class AdminListingsView(APIView):
             .prefetch_related("media")
             .order_by("-created_at")
         )
-        return Response(ListingSerializer(qs, many=True).data)
+        if q := request.query_params.get("q"):
+            qs = qs.filter(Q(title__icontains=q) | Q(title_am__icontains=q))
+        if cat := request.query_params.get("category"):
+            qs = qs.filter(category=cat)
+        if lt := request.query_params.get("listing_type"):
+            qs = qs.filter(listing_type=lt)
+        if status := request.query_params.get("status"):
+            qs = qs.filter(status=status)
+        if region := request.query_params.get("region"):
+            qs = qs.filter(location__region__icontains=region)
+        if verified := request.query_params.get("verified"):
+            qs = qs.filter(is_verified=verified.lower() == "true")
+        if featured := request.query_params.get("featured"):
+            qs = qs.filter(is_featured=featured.lower() == "true")
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(ListingSerializer(page, many=True).data)
 
 
 class CreateListingView(APIView):
