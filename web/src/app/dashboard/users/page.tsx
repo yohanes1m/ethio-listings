@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { UserPlus, Users, X } from 'lucide-react'
-import { useAdminUsers, useChangeUserRole, useCreateBroker } from '@/hooks/useAdminListings'
+import { UserPlus, Users, X, ShieldOff, ShieldCheck } from 'lucide-react'
+import { useAdminUsers, useChangeUserRole, useCreateBroker, useSuspendUser } from '@/hooks/useAdminListings'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,6 +51,12 @@ type PendingRoleChange = {
   newRole: string
 }
 
+type PendingSuspend = {
+  userId: string
+  userName: string
+  currentlyActive: boolean
+}
+
 function UsersContent() {
   const [params, setParams] = useState({ page: 1, q: '', role: '' })
   const { data, isLoading } = useAdminUsers(
@@ -58,9 +64,11 @@ function UsersContent() {
   )
   const changeRole = useChangeUserRole()
   const createBroker = useCreateBroker()
+  const suspendUser = useSuspendUser()
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [pendingRole, setPendingRole] = useState<PendingRoleChange | null>(null)
+  const [pendingSuspend, setPendingSuspend] = useState<PendingSuspend | null>(null)
 
   function setParam(key: string, value: string | null | number) {
     setParams((p) => ({ ...p, [key]: value ?? '', page: 1 }))
@@ -198,15 +206,22 @@ function UsersContent() {
       {users.length > 0 && (
         <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
           {users.map((u) => (
-            <div key={u.id} className="flex items-center gap-3 p-4 bg-card hover:bg-muted/30 transition-colors">
+            <div key={u.id} className={`flex items-center gap-3 p-4 bg-card hover:bg-muted/30 transition-colors ${!u.is_active ? 'opacity-60' : ''}`}>
               <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                 {u.first_name[0]}{u.last_name[0]}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">{u.first_name} {u.last_name}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-medium">{u.first_name} {u.last_name}</p>
+                  {!u.is_active && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-destructive border border-destructive/30 rounded px-1">
+                      Suspended
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground truncate">{u.email}</p>
               </div>
-              <Badge variant={ROLE_VARIANT[u.role] ?? 'secondary'} className="text-[10px] shrink-0">
+              <Badge variant={ROLE_VARIANT[u.role] ?? 'secondary'} className="text-[10px] shrink-0 hidden sm:inline-flex">
                 {u.role}
               </Badge>
               <Select
@@ -224,6 +239,17 @@ function UsersContent() {
                   <SelectItem value="ADMIN">Admin</SelectItem>
                 </SelectContent>
               </Select>
+              <button
+                onClick={() => setPendingSuspend({ userId: u.id, userName: `${u.first_name} ${u.last_name}`, currentlyActive: u.is_active })}
+                title={u.is_active ? 'Suspend user' : 'Reactivate user'}
+                className={`p-1.5 rounded-md border transition-colors shrink-0 ${
+                  u.is_active
+                    ? 'border-border text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/5'
+                    : 'border-emerald-500/40 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                }`}
+              >
+                {u.is_active ? <ShieldOff className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+              </button>
             </div>
           ))}
         </div>
@@ -250,6 +276,24 @@ function UsersContent() {
             changeRole.mutate({ id: pendingRole.userId, role: pendingRole.newRole })
           }
           setPendingRole(null)
+        }}
+      />
+
+      <ConfirmDialog
+        open={!!pendingSuspend}
+        onOpenChange={(open) => { if (!open) setPendingSuspend(null) }}
+        title={pendingSuspend?.currentlyActive ? `Suspend ${pendingSuspend.userName}?` : `Reactivate ${pendingSuspend?.userName}?`}
+        description={
+          pendingSuspend?.currentlyActive
+            ? `${pendingSuspend.userName} will be suspended. They will be unable to log in until reactivated.`
+            : `${pendingSuspend?.userName} will be reactivated and can log in again.`
+        }
+        confirmLabel={pendingSuspend?.currentlyActive ? 'Suspend user' : 'Reactivate user'}
+        variant={pendingSuspend?.currentlyActive ? 'warning' : 'default'}
+        isLoading={suspendUser.isPending}
+        onConfirm={() => {
+          if (pendingSuspend) suspendUser.mutate(pendingSuspend.userId)
+          setPendingSuspend(null)
         }}
       />
 
