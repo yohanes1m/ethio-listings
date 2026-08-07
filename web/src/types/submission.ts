@@ -1,5 +1,12 @@
 export type SubmissionStatus = 'PENDING' | 'CONTACTED' | 'APPROVED' | 'REJECTED'
 
+export interface PaginatedSubmissions {
+  count: number
+  next: string | null
+  previous: string | null
+  results: Submission[]
+}
+
 export interface Submission {
   id: string
   category: string
