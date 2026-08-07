@@ -10,7 +10,40 @@ export interface AdminUser {
   first_name: string
   last_name: string
   role: string
+  is_active: boolean
   created_at: string
+}
+
+export interface Deal {
+  id: string
+  listing: string | null
+  listing_title: string | null
+  listing_category: string | null
+  listing_type: string | null
+  listing_status: string | null
+  closed_by: string | null
+  closed_by_name: string | null
+  co_broker: string | null
+  co_broker_split_pct: string | null
+  actual_price: string | null
+  commission_rate: string | null
+  commission_amount: string | null
+  notes: string | null
+  closed_at: string
+}
+
+export interface PaginatedDeals {
+  count: number
+  next: string | null
+  previous: string | null
+  results: Deal[]
+}
+
+export interface DealSummary {
+  deals_count: number
+  total_commission: number
+  this_month_deals: number
+  this_month_commission: number
 }
 
 export interface PaginatedAdminUsers {
@@ -153,6 +186,32 @@ export function useCloseDeal() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['listings', 'mine'] })
       qc.invalidateQueries({ queryKey: ['listings'] })
+      qc.invalidateQueries({ queryKey: ['deals'] })
     },
+  })
+}
+
+export function useDeals(params: { page?: number } = {}) {
+  return useQuery({
+    queryKey: ['deals', 'list', params],
+    queryFn: () =>
+      authApiClient.get<PaginatedDeals>('/deals/', { params }).then((r) => r.data),
+  })
+}
+
+export function useDealSummary() {
+  return useQuery({
+    queryKey: ['deals', 'summary'],
+    queryFn: () =>
+      authApiClient.get<DealSummary>('/deals/summary/').then((r) => r.data),
+  })
+}
+
+export function useSuspendUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      authApiClient.patch(`/auth/users/${id}/suspend/`).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }),
   })
 }

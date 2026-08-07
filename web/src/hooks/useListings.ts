@@ -72,12 +72,12 @@ export function useListing(id: string) {
   })
 }
 
-export function useMapPins(category?: string) {
+export function useMapPins(params: PublicListingsParams = {}) {
   return useQuery({
-    queryKey: ['listings', 'map', category],
+    queryKey: ['listings', 'map', params],
     queryFn: () =>
       apiClient
-        .get<MapPin[]>('/listings/map/', { params: category ? { category } : {} })
+        .get<MapPin[]>('/listings/map/', { params })
         .then((r) => r.data),
     staleTime: 60_000,
   })
