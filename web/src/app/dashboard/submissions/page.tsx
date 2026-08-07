@@ -6,6 +6,7 @@ import { useSubmissions, useUpdateSubmission, useApproveSubmission } from '@/hoo
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
 import type { SubmissionStatus } from '@/types/submission'
 
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
@@ -19,9 +20,18 @@ const TABS: SubmissionStatus[] = ['PENDING', 'CONTACTED', 'APPROVED', 'REJECTED'
 
 export default function SubmissionsPage() {
   const [tab, setTab] = useState<SubmissionStatus | 'ALL'>('ALL')
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [rejectMessage, setRejectMessage] = useState('')
   const { data, isLoading } = useSubmissions(tab === 'ALL' ? undefined : tab)
   const update = useUpdateSubmission()
   const approve = useApproveSubmission()
+
+  function handleReject(id: string) {
+    update.mutate(
+      { id, status: 'REJECTED', owner_message: rejectMessage || undefined },
+      { onSuccess: () => { setRejectingId(null); setRejectMessage('') } },
+    )
+  }
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -98,16 +108,44 @@ export default function SubmissionsPage() {
                       Approve → Publish
                     </Button>
                   )}
-                  {s.status !== 'REJECTED' && s.status !== 'APPROVED' && (
+                  {s.status !== 'REJECTED' && s.status !== 'APPROVED' && rejectingId !== s.id && (
                     <Button
                       size="sm"
                       variant="outline"
                       className="text-xs h-7 text-destructive border-destructive/30"
-                      onClick={() => update.mutate({ id: s.id, status: 'REJECTED' })}
-                      disabled={update.isPending}
+                      onClick={() => { setRejectingId(s.id); setRejectMessage('') }}
                     >
                       Reject
                     </Button>
+                  )}
+                  {rejectingId === s.id && (
+                    <div className="w-full space-y-2 pt-1">
+                      <Textarea
+                        className="text-xs min-h-[60px]"
+                        placeholder="Optional message to owner explaining the decline reason…"
+                        value={rejectMessage}
+                        onChange={(e) => setRejectMessage(e.target.value)}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="text-xs h-7"
+                          onClick={() => handleReject(s.id)}
+                          disabled={update.isPending}
+                        >
+                          Confirm Reject
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-xs h-7"
+                          onClick={() => { setRejectingId(null); setRejectMessage('') }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
                   )}
                   {s.owner_whatsapp && (
                     <a

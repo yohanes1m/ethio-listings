@@ -30,6 +30,41 @@ class PublicListingListView(APIView):
             qs = qs.filter(price__gte=price_min)
         if price_max := request.query_params.get("price_max"):
             qs = qs.filter(price__lte=price_max)
+
+        cat = request.query_params.get("category")
+        if cat == "HOUSE":
+            if beds := request.query_params.get("bedrooms_min"):
+                qs = qs.filter(house_details__bedrooms__gte=beds)
+            if request.query_params.get("furnished") == "true":
+                qs = qs.filter(house_details__furnished=True)
+            if request.query_params.get("parking") == "true":
+                qs = qs.filter(house_details__parking=True)
+        elif cat == "CAR":
+            if make := request.query_params.get("make"):
+                qs = qs.filter(car_details__make__icontains=make)
+            if fuel := request.query_params.get("fuel_type"):
+                qs = qs.filter(car_details__fuel_type=fuel)
+            if trans := request.query_params.get("transmission"):
+                qs = qs.filter(car_details__transmission=trans)
+            if cond := request.query_params.get("condition"):
+                qs = qs.filter(car_details__condition=cond)
+            if year_min := request.query_params.get("year_min"):
+                qs = qs.filter(car_details__year__gte=year_min)
+            if year_max := request.query_params.get("year_max"):
+                qs = qs.filter(car_details__year__lte=year_max)
+        elif cat == "LAND":
+            if land_use := request.query_params.get("land_use"):
+                qs = qs.filter(land_details__land_use=land_use)
+            if request.query_params.get("has_title_deed") == "true":
+                qs = qs.filter(land_details__has_title_deed=True)
+            if request.query_params.get("road_access") == "true":
+                qs = qs.filter(land_details__road_access=True)
+        elif cat == "MACHINE":
+            if mtype := request.query_params.get("machine_type"):
+                qs = qs.filter(machine_details__machine_type__icontains=mtype)
+            if cond := request.query_params.get("condition"):
+                qs = qs.filter(machine_details__condition=cond)
+
         paginator = PageNumberPagination()
         paginator.page_size = 20
         page = paginator.paginate_queryset(qs, request)

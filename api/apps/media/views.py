@@ -3,8 +3,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.listings.models import Listing
-from .models import ListingMedia
+from .models import ListingMedia, MediaType
 from .services import delete_file, upload_file
+
+_VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/x-msvideo", "video/webm"}
+_MAX_IMAGE = 10 * 1024 * 1024   # 10 MB
+_MAX_VIDEO = 100 * 1024 * 1024  # 100 MB
 
 
 class ListingMediaView(APIView):
@@ -19,14 +23,22 @@ class ListingMediaView(APIView):
         if not file:
             return Response({"detail": "No file provided."}, status=400)
 
+        is_video = file.content_type in _VIDEO_TYPES
+        size_limit = _MAX_VIDEO if is_video else _MAX_IMAGE
+        if file.size > size_limit:
+            label = "100 MB" if is_video else "10 MB"
+            return Response({"detail": f"File too large. Maximum is {label}."}, status=400)
+
+        media_type = MediaType.VIDEO if is_video else MediaType.IMAGE
         result = upload_file(file, str(listing_id), listing.category.lower())
         media = ListingMedia.objects.create(
             listing=listing,
             url=result["url"],
             cloudinary_public_id=result["cloudinary_public_id"],
+            media_type=media_type,
             order=ListingMedia.objects.filter(listing=listing).count(),
         )
-        return Response({"id": media.id, "url": media.url}, status=201)
+        return Response({"id": media.id, "url": media.url, "media_type": media_type}, status=201)
 
 
 class ListingMediaDetailView(APIView):

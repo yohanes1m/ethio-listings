@@ -26,8 +26,8 @@ export function useSubmissions(status?: string) {
 export function useUpdateSubmission() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) =>
-      authApiClient.patch(`/submissions/${id}/`, { status }).then((r) => r.data),
+    mutationFn: ({ id, status, owner_message }: { id: string; status: string; owner_message?: string }) =>
+      authApiClient.patch(`/submissions/${id}/`, { status, ...(owner_message ? { owner_message } : {}) }).then((r) => r.data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['submissions'] })
       toast.success('Submission updated')

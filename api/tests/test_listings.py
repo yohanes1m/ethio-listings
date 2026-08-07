@@ -66,6 +66,46 @@ class TestPublicListings:
         r = api_client.get("/api/listings/public/?q=villa")
         assert r.data["count"] == 1
 
+    def test_house_filter_bedrooms_min(self, api_client, db):
+        l1 = ListingFactory(category="HOUSE")
+        l2 = ListingFactory(category="HOUSE")
+        HouseDetailsFactory(listing=l1, bedrooms=2)
+        HouseDetailsFactory(listing=l2, bedrooms=4)
+        r = api_client.get("/api/listings/public/?category=HOUSE&bedrooms_min=3")
+        assert r.data["count"] == 1
+
+    def test_house_filter_furnished(self, api_client, db):
+        l1 = ListingFactory(category="HOUSE")
+        l2 = ListingFactory(category="HOUSE")
+        HouseDetailsFactory(listing=l1, furnished=True)
+        HouseDetailsFactory(listing=l2, furnished=False)
+        r = api_client.get("/api/listings/public/?category=HOUSE&furnished=true")
+        assert r.data["count"] == 1
+
+    def test_car_filter_fuel_type(self, api_client, db):
+        l1 = ListingFactory(category="CAR")
+        l2 = ListingFactory(category="CAR")
+        CarDetailsFactory(listing=l1, fuel_type="PETROL")
+        CarDetailsFactory(listing=l2, fuel_type="DIESEL")
+        r = api_client.get("/api/listings/public/?category=CAR&fuel_type=PETROL")
+        assert r.data["count"] == 1
+
+    def test_land_filter_land_use(self, api_client, db):
+        l1 = ListingFactory(category="LAND")
+        l2 = ListingFactory(category="LAND")
+        LandDetailsFactory(listing=l1, land_use="RESIDENTIAL")
+        LandDetailsFactory(listing=l2, land_use="COMMERCIAL")
+        r = api_client.get("/api/listings/public/?category=LAND&land_use=RESIDENTIAL")
+        assert r.data["count"] == 1
+
+    def test_machine_filter_condition(self, api_client, db):
+        l1 = ListingFactory(category="MACHINE")
+        l2 = ListingFactory(category="MACHINE")
+        MachineDetailsFactory(listing=l1, condition="NEW")
+        MachineDetailsFactory(listing=l2, condition="USED")
+        r = api_client.get("/api/listings/public/?category=MACHINE&condition=NEW")
+        assert r.data["count"] == 1
+
 
 # ── Featured listings ─────────────────────────────────────────────────────────
 

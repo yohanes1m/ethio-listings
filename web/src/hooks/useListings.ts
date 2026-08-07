@@ -13,6 +13,23 @@ interface PublicListingsParams {
   price_min?: number
   price_max?: number
   page?: number
+  // House
+  bedrooms_min?: string
+  furnished?: string
+  parking?: string
+  // Car
+  make?: string
+  fuel_type?: string
+  transmission?: string
+  condition?: string
+  year_min?: string
+  year_max?: string
+  // Land
+  land_use?: string
+  has_title_deed?: string
+  road_access?: string
+  // Machine
+  machine_type?: string
 }
 
 export function usePublicListings(params: PublicListingsParams = {}) {
