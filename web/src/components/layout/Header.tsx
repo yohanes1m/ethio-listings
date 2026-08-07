@@ -27,6 +27,24 @@ export function Header() {
           <span className="text-primary">Ethio</span>Listings
         </Link>
 
+        {/* Desktop nav links */}
+        <nav className="hidden sm:flex items-center gap-1">
+          <Link
+            href="/browse/houses"
+            className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
+          >
+            Browse
+          </Link>
+          {isAuthenticated && (
+            <Link
+              href="/saved"
+              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
+            >
+              Saved
+            </Link>
+          )}
+        </nav>
+
         <div className="flex-1" />
 
         {/* Language toggle */}

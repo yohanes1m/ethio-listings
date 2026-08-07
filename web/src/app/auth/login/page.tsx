@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,6 +20,14 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+      <Link
+        href="/"
+        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4 w-fit transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to home
+      </Link>
     <Card className="shadow-sm border border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-semibold">ግባ</CardTitle>
@@ -79,5 +88,6 @@ export default function LoginPage() {
         </Link>
       </CardFooter>
     </Card>
+    </>
   )
 }
