@@ -1,3 +1,5 @@
+from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,10 +14,25 @@ class SubmissionListCreateView(APIView):
     def get(self, request):
         from apps.common.permissions import IsBrokerOrAdmin
         IsBrokerOrAdmin().check_object_permissions(request, None)
-        qs = ListingRequest.objects.select_related("owner", "assigned_to")
+        qs = ListingRequest.objects.select_related("owner", "assigned_to").order_by("-created_at")
         if status := request.query_params.get("status"):
             qs = qs.filter(status=status)
-        return Response(ListingRequestSerializer(qs, many=True).data)
+        if q := request.query_params.get("q"):
+            qs = qs.filter(
+                Q(region__icontains=q)
+                | Q(owner__email__icontains=q)
+                | Q(owner__first_name__icontains=q)
+            )
+        if cat := request.query_params.get("category"):
+            qs = qs.filter(category=cat)
+        if lt := request.query_params.get("listing_type"):
+            qs = qs.filter(listing_type=lt)
+        if region := request.query_params.get("region"):
+            qs = qs.filter(region__icontains=region)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        page = paginator.paginate_queryset(qs, request)
+        return paginator.get_paginated_response(ListingRequestSerializer(page, many=True).data)
 
     def post(self, request):
         serializer = ListingRequestSerializer(data=request.data)

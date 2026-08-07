@@ -48,13 +48,13 @@ class TestSubmissionQueue:
         ListingRequestFactory.create_batch(3)
         r = broker_client.get("/api/submissions/")
         assert r.status_code == 200
-        assert len(r.data) == 3
+        assert r.data["count"] == 3
 
     def test_admin_sees_all_submissions(self, admin_client, db):
         ListingRequestFactory.create_batch(2)
         r = admin_client.get("/api/submissions/")
         assert r.status_code == 200
-        assert len(r.data) == 2
+        assert r.data["count"] == 2
 
     def test_buyer_cannot_see_queue(self, buyer_client):
         r = buyer_client.get("/api/submissions/")
@@ -69,7 +69,7 @@ class TestSubmissionQueue:
         ListingRequestFactory(status=SubmissionStatus.APPROVED)
         r = broker_client.get("/api/submissions/?status=PENDING")
         assert r.status_code == 200
-        assert all(s["status"] == "PENDING" for s in r.data)
+        assert all(s["status"] == "PENDING" for s in r.data["results"])
 
 
 # ── My submissions (GET /api/submissions/mine/) ───────────────────────────────
