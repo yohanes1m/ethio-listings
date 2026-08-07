@@ -43,7 +43,7 @@ function initials(first: string, last: string) {
   return `${first[0] ?? ''}${last[0] ?? ''}`.toUpperCase() || '?'
 }
 
-function SidebarContent({ onClose = () => {} }: { onClose?: () => void }) {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const { user } = useAuthStore()
   const logout = useLogout()
   const pathname = usePathname()
@@ -58,14 +58,14 @@ function SidebarContent({ onClose = () => {} }: { onClose?: () => void }) {
       <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
         <Link
           href="/"
-          onClick={onClose}
+          onClick={() => onClose?.()}
           className="text-sm font-bold tracking-tight"
         >
           <span className="text-primary">Ethio</span>Listings
         </Link>
         {onClose && (
           <button
-            onClick={onClose}
+            onClick={() => onClose?.()}
             className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Close menu"
           >
@@ -110,7 +110,7 @@ function SidebarContent({ onClose = () => {} }: { onClose?: () => void }) {
               )}
               <Link
                 href={item.href}
-                onClick={onClose}
+                onClick={() => onClose?.()}
                 className={`group relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                   active
                     ? 'bg-primary/10 text-primary font-medium'
@@ -132,7 +132,7 @@ function SidebarContent({ onClose = () => {} }: { onClose?: () => void }) {
       <div className="px-3 py-3 border-t border-border space-y-0.5 shrink-0">
         <Link
           href="/"
-          onClick={onClose}
+          onClick={() => onClose?.()}
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
         >
           <Home className="w-4 h-4 shrink-0" />
@@ -166,8 +166,21 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => {
-    if (user && role === 'BUYER') router.replace('/saved')
-  }, [user, role, router])
+    if (!user) return
+
+    if (role === 'BUYER') {
+      router.replace('/saved')
+      return
+    }
+
+    const adminOnlyPath = [
+      '/dashboard/all-listings',
+      '/dashboard/users',
+      '/dashboard/verifications',
+    ].some((path) => pathname.startsWith(path))
+
+    if (role !== 'ADMIN' && adminOnlyPath) router.replace('/dashboard')
+  }, [user, role, pathname, router])
 
   return (
     <div className="min-h-screen flex bg-background">

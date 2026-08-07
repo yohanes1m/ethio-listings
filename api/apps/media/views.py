@@ -6,9 +6,25 @@ from apps.listings.models import Listing
 from .models import ListingMedia, MediaType
 from .services import delete_file, upload_file
 
+_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+
 _VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/x-msvideo", "video/webm"}
 _MAX_IMAGE = 10 * 1024 * 1024   # 10 MB
 _MAX_VIDEO = 100 * 1024 * 1024  # 100 MB
+
+
+class SubmissionUploadView(APIView):
+    """Standalone upload for submission photos — no listing required."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        file = request.FILES.get("file")
+        if not file:
+            return Response({"detail": "No file provided."}, status=400)
+        if file.size > _MAX_IMAGE:
+            return Response({"detail": "File too large. Maximum is 10 MB."}, status=400)
+        result = upload_file(file, "submission", "submissions")
+        return Response({"url": result["url"]}, status=201)
 
 
 class ListingMediaView(APIView):

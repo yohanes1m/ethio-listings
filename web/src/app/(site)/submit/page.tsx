@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ImagePlus, Upload, X } from 'lucide-react'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,12 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useRegions, useWoredas } from '@/hooks/useLocations'
+import { useRegions, useZones, useWoredas } from '@/hooks/useLocations'
 import { useSubmit } from '@/hooks/useSubmissions'
+import authApiClient from '@/lib/authApiClient'
 
-type Step = 1 | 2 | 3 | 4
+type Step = 1 | 2 | 3 | 4 | 5
 
-const STEPS = ['Category', 'Details', 'Location', 'Contact']
+const STEPS = ['Category', 'Details', 'Location', 'Photos', 'Contact']
 
 export default function SubmitPage() {
   return (
@@ -42,21 +44,51 @@ function SubmitForm() {
     owner_phone: '',
     owner_whatsapp: '',
   })
+  const [photos, setPhotos] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const { data: regions } = useRegions()
+  const { data: zones } = useZones(form.region)
   const { data: woredas } = useWoredas(form.zone)
   const submit = useSubmit()
 
   function update(field: string, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }))
+    if (field === 'region') {
+      setForm((prev) => ({ ...prev, region: value, zone: '', woreda: '' }))
+    } else if (field === 'zone') {
+      setForm((prev) => ({ ...prev, zone: value, woreda: '' }))
+    } else {
+      setForm((prev) => ({ ...prev, [field]: value }))
+    }
   }
 
   function updateDetail(field: string, value: string | number | boolean) {
     setForm((prev) => ({ ...prev, details: { ...prev.details, [field]: value } }))
   }
 
+  function handleFiles(fileList: FileList | null) {
+    if (!fileList) return
+    const remaining = 5 - photos.length
+    const newFiles = Array.from(fileList).slice(0, remaining)
+    const newPreviews = newFiles.map((f) => URL.createObjectURL(f))
+    setPhotos((prev) => [...prev, ...newFiles])
+    setPreviews((prev) => [...prev, ...newPreviews])
+  }
+
+  function removePhoto(index: number) {
+    URL.revokeObjectURL(previews[index] ?? '')
+    setPhotos((prev) => prev.filter((_, i) => i !== index))
+    setPreviews((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    handleFiles(e.dataTransfer.files)
+  }
+
   function next() {
-    setStep((s) => (s < 4 ? ((s + 1) as Step) : s))
+    setStep((s) => (s < 5 ? ((s + 1) as Step) : s))
   }
 
   function back() {
@@ -64,6 +96,18 @@ function SubmitForm() {
   }
 
   async function handleSubmit() {
+    const photoUrls: string[] = []
+    for (const file of photos) {
+      try {
+        const fd = new FormData()
+        fd.append('file', file)
+        const res = await authApiClient.post<{ url: string }>('/media/upload/', fd)
+        photoUrls.push(res.data.url)
+      } catch {
+        // skip failed upload, continue with remaining
+      }
+    }
+
     await submit.mutateAsync({
       category: form.category,
       listing_type: form.listing_type,
@@ -74,6 +118,7 @@ function SubmitForm() {
       owner_phone: form.owner_phone,
       ...(form.owner_whatsapp ? { owner_whatsapp: form.owner_whatsapp } : {}),
       details: form.details,
+      ...(photoUrls.length > 0 ? { photos: photoUrls } : {}),
     })
     router.push('/my-submissions')
   }
@@ -116,6 +161,7 @@ function SubmitForm() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Step 1: Category */}
           {step === 1 && (
             <>
               <div className="space-y-1.5">
@@ -147,6 +193,7 @@ function SubmitForm() {
             </>
           )}
 
+          {/* Step 2: Details — category-specific */}
           {step === 2 && (
             <>
               <div className="space-y-1.5">
@@ -166,6 +213,7 @@ function SubmitForm() {
                   placeholder="e.g. 2500000"
                 />
               </div>
+
               {form.category === 'HOUSE' && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
@@ -189,9 +237,219 @@ function SubmitForm() {
                   </div>
                 </div>
               )}
+
+              {form.category === 'CAR' && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Make</Label>
+                      <Input
+                        value={String(form.details.make ?? '')}
+                        onChange={(e) => updateDetail('make', e.target.value)}
+                        placeholder="Toyota"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Model</Label>
+                      <Input
+                        value={String(form.details.model ?? '')}
+                        onChange={(e) => updateDetail('model', e.target.value)}
+                        placeholder="Land Cruiser"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Year</Label>
+                      <Input
+                        type="number"
+                        value={String(form.details.year ?? '')}
+                        onChange={(e) => updateDetail('year', parseInt(e.target.value))}
+                        placeholder="2020"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Mileage (km)</Label>
+                      <Input
+                        type="number"
+                        value={String(form.details.mileage_km ?? '')}
+                        onChange={(e) => updateDetail('mileage_km', parseInt(e.target.value))}
+                        placeholder="50000"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Condition</Label>
+                      <Select
+                        value={String(form.details.condition ?? '')}
+                        onValueChange={(v) => { if (v) updateDetail('condition', v) }}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="NEW">New</SelectItem>
+                          <SelectItem value="EXCELLENT">Excellent</SelectItem>
+                          <SelectItem value="GOOD">Good</SelectItem>
+                          <SelectItem value="FAIR">Fair</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Fuel Type</Label>
+                      <Select
+                        value={String(form.details.fuel_type ?? '')}
+                        onValueChange={(v) => { if (v) updateDetail('fuel_type', v) }}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PETROL">Petrol</SelectItem>
+                          <SelectItem value="DIESEL">Diesel</SelectItem>
+                          <SelectItem value="HYBRID">Hybrid</SelectItem>
+                          <SelectItem value="ELECTRIC">Electric</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Transmission</Label>
+                    <Select
+                      value={String(form.details.transmission ?? '')}
+                      onValueChange={(v) => { if (v) updateDetail('transmission', v) }}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AUTOMATIC">Automatic</SelectItem>
+                        <SelectItem value="MANUAL">Manual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
+
+              {form.category === 'LAND' && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Total Area</Label>
+                      <Input
+                        type="number"
+                        value={String(form.details.total_area ?? '')}
+                        onChange={(e) => updateDetail('total_area', e.target.value)}
+                        placeholder="500"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Area Unit</Label>
+                      <Select
+                        value={String(form.details.area_unit ?? 'SQM')}
+                        onValueChange={(v) => { if (v) updateDetail('area_unit', v) }}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="SQM">m²</SelectItem>
+                          <SelectItem value="HECTARE">Hectare</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Land Use</Label>
+                    <Select
+                      value={String(form.details.land_use ?? '')}
+                      onValueChange={(v) => { if (v) updateDetail('land_use', v) }}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select use" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="RESIDENTIAL">Residential</SelectItem>
+                        <SelectItem value="COMMERCIAL">Commercial</SelectItem>
+                        <SelectItem value="AGRICULTURAL">Agricultural</SelectItem>
+                        <SelectItem value="MIXED">Mixed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(form.details.has_title_deed)}
+                        onChange={(e) => updateDetail('has_title_deed', e.target.checked)}
+                        className="rounded"
+                      />
+                      Has Title Deed
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(form.details.road_access)}
+                        onChange={(e) => updateDetail('road_access', e.target.checked)}
+                        className="rounded"
+                      />
+                      Road Access
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {form.category === 'MACHINE' && (
+                <>
+                  <div className="space-y-1.5">
+                    <Label>Machine Type</Label>
+                    <Input
+                      value={String(form.details.machine_type ?? '')}
+                      onChange={(e) => updateDetail('machine_type', e.target.value)}
+                      placeholder="Tractor, Excavator, Generator…"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Manufacturer</Label>
+                      <Input
+                        value={String(form.details.manufacturer ?? '')}
+                        onChange={(e) => updateDetail('manufacturer', e.target.value)}
+                        placeholder="John Deere"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Year</Label>
+                      <Input
+                        type="number"
+                        value={String(form.details.year ?? '')}
+                        onChange={(e) => updateDetail('year', parseInt(e.target.value))}
+                        placeholder="2018"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Condition</Label>
+                      <Select
+                        value={String(form.details.condition ?? '')}
+                        onValueChange={(v) => { if (v) updateDetail('condition', v) }}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="NEW">New</SelectItem>
+                          <SelectItem value="USED">Used</SelectItem>
+                          <SelectItem value="RECONDITIONED">Reconditioned</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Operating Hours</Label>
+                      <Input
+                        type="number"
+                        value={String(form.details.operating_hours ?? '')}
+                        onChange={(e) => updateDetail('operating_hours', parseInt(e.target.value))}
+                        placeholder="2000"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
 
+          {/* Step 3: Location */}
           {step === 3 && (
             <>
               <div className="space-y-1.5">
@@ -202,21 +460,41 @@ function SubmitForm() {
                   </SelectTrigger>
                   <SelectContent>
                     {(regions ?? []).map((r) => (
-                      <SelectItem key={r} value={r}>
-                        {r}
-                      </SelectItem>
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label>Woreda / Area</Label>
-                <Input
-                  value={form.woreda}
-                  onChange={(e) => update('woreda', e.target.value)}
-                  placeholder="e.g. Bole, Kirkos"
-                />
-              </div>
+              {form.region && (
+                <div className="space-y-1.5">
+                  <Label>Zone</Label>
+                  <Select value={form.zone} onValueChange={(v) => { if (v) update('zone', v) }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select zone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(zones ?? []).map((z) => (
+                        <SelectItem key={z} value={z}>{z}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {form.zone && (
+                <div className="space-y-1.5">
+                  <Label>Woreda</Label>
+                  <Select value={form.woreda} onValueChange={(v) => { if (v) update('woreda', v) }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select woreda" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(woredas ?? []).map((w) => (
+                        <SelectItem key={w} value={w}>{w}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="space-y-1.5">
                 <Label>
                   Address <span className="text-muted-foreground font-normal">(optional)</span>
@@ -230,7 +508,78 @@ function SubmitForm() {
             </>
           )}
 
+          {/* Step 4: Photos */}
           {step === 4 && (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Upload up to 5 photos. The first photo becomes the cover image.
+              </p>
+              <div
+                onDrop={handleDrop}
+                onDragOver={(e) => e.preventDefault()}
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-primary/50 hover:bg-muted/40 transition-colors"
+              >
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium">Drop photos here or click to browse</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP — max 5 files</p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => handleFiles(e.target.files)}
+                />
+              </div>
+
+              {photos.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {previews.map((src, i) => (
+                    <div
+                      key={i}
+                      className="relative aspect-square rounded-lg overflow-hidden bg-muted group"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                      {i === 0 && (
+                        <span className="absolute bottom-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-medium">
+                          Cover
+                        </span>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removePhoto(i) }}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {photos.length < 5 && (
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="aspect-square rounded-lg border-2 border-dashed border-border flex items-center justify-center hover:border-primary/50 transition-colors"
+                    >
+                      <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {photos.length === 0 && (
+                <p className="text-xs text-center text-muted-foreground">
+                  No photos yet — you can skip this step.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Step 5: Contact */}
+          {step === 5 && (
             <>
               <div className="space-y-1.5">
                 <Label>Your Phone Number</Label>
@@ -258,22 +607,20 @@ function SubmitForm() {
                 <p>Type: {form.listing_type}</p>
                 <p>
                   Location: {form.region}
+                  {form.zone ? `, ${form.zone}` : ''}
                   {form.woreda ? `, ${form.woreda}` : ''}
                 </p>
+                {photos.length > 0 && <p>Photos: {photos.length}</p>}
               </div>
             </>
           )}
 
           {/* Navigation */}
           <div className="flex justify-between pt-2">
-            <Button
-              variant="outline"
-              onClick={back}
-              disabled={step === 1}
-            >
+            <Button variant="outline" onClick={back} disabled={step === 1}>
               Back
             </Button>
-            {step < 4 ? (
+            {step < 5 ? (
               <Button
                 onClick={next}
                 disabled={
