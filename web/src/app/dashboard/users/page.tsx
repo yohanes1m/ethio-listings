@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination } from '@/components/ui/pagination'
 import { RoleGuard } from '@/components/auth/RoleGuard'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
@@ -18,6 +19,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'react-hot-toast'
+
+const PAGE_SIZE = 20
 
 export default function UsersPage() {
   return (
@@ -49,12 +52,25 @@ type PendingRoleChange = {
 }
 
 function UsersContent() {
-  const { data: users, isLoading } = useAdminUsers()
+  const [params, setParams] = useState({ page: 1, q: '', role: '' })
+  const { data, isLoading } = useAdminUsers(
+    Object.fromEntries(Object.entries(params).filter(([, v]) => v !== '' && v !== 0))
+  )
   const changeRole = useChangeUserRole()
   const createBroker = useCreateBroker()
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [pendingRole, setPendingRole] = useState<PendingRoleChange | null>(null)
+
+  function setParam(key: string, value: string | number) {
+    setParams((p) => ({ ...p, [key]: value, page: 1 }))
+  }
+
+  const hasFilters = params.q !== '' || params.role !== ''
+
+  function clearFilters() {
+    setParams((p) => ({ ...p, q: '', role: '', page: 1 }))
+  }
 
   function update(field: string, value: string) {
     setForm((p) => ({ ...p, [field]: value }))
@@ -117,19 +133,52 @@ function UsersContent() {
   }
 
   const dialogProps = pendingRole ? buildDialogProps(pendingRole) : null
+  const users = data?.results ?? []
+  const total = data?.count ?? 0
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="max-w-4xl space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Users</h1>
-        <div className="flex items-center gap-3">
-          <p className="text-sm text-muted-foreground">{users?.length ?? 0} total</p>
-          <Button size="sm" onClick={() => setShowModal(true)}>
-            <UserPlus className="w-4 h-4 mr-2" />
-            Create Broker
-          </Button>
-        </div>
+        <Button size="sm" onClick={() => setShowModal(true)}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          Create Broker
+        </Button>
       </div>
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-2">
+        <Input
+          placeholder="Search by name or email…"
+          value={params.q}
+          onChange={(e) => setParam('q', e.target.value)}
+          className="h-8 text-xs w-52 min-w-[160px]"
+        />
+        <Select value={params.role} onValueChange={(v) => setParam('role', v)}>
+          <SelectTrigger className="h-8 text-xs w-28">
+            <SelectValue placeholder="Role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ADMIN">Admin</SelectItem>
+            <SelectItem value="BROKER">Broker</SelectItem>
+            <SelectItem value="BUYER">Buyer</SelectItem>
+          </SelectContent>
+        </Select>
+        {hasFilters && (
+          <Button variant="ghost" size="sm" className="h-8 text-xs px-2" onClick={clearFilters}>
+            <X className="w-3.5 h-3.5 mr-1" />Clear
+          </Button>
+        )}
+      </div>
+
+      {/* Count */}
+      {!isLoading && (
+        <p className="text-xs text-muted-foreground">
+          {total === 0
+            ? hasFilters ? 'No users match your filters.' : 'No users found.'
+            : `Showing ${Math.min((params.page - 1) * PAGE_SIZE + 1, total)}–${Math.min(params.page * PAGE_SIZE, total)} of ${total}`}
+        </p>
+      )}
 
       {isLoading && (
         <div className="space-y-2">
@@ -137,14 +186,16 @@ function UsersContent() {
         </div>
       )}
 
-      {!isLoading && !users?.length && (
+      {!isLoading && users.length === 0 && (
         <div className="text-center py-20">
           <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">No users found.</p>
+          <p className="text-muted-foreground">
+            {hasFilters ? 'No users match your filters.' : 'No users found.'}
+          </p>
         </div>
       )}
 
-      {users && users.length > 0 && (
+      {users.length > 0 && (
         <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
           {users.map((u) => (
             <div key={u.id} className="flex items-center gap-3 p-4 bg-card hover:bg-muted/30 transition-colors">
@@ -177,6 +228,13 @@ function UsersContent() {
           ))}
         </div>
       )}
+
+      <Pagination
+        page={params.page}
+        count={total}
+        pageSize={PAGE_SIZE}
+        onChange={(p) => setParams((prev) => ({ ...prev, page: p }))}
+      />
 
       <ConfirmDialog
         open={!!pendingRole}
