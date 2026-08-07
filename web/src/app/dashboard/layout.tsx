@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Home,
+  Handshake,
 } from 'lucide-react'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { useAuthStore } from '@/store/authStore'
@@ -32,6 +33,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/my-listings',  label: 'My Listings',    Icon: ListChecks,      roles: ['BROKER', 'ADMIN'] },
   { href: '/dashboard/add',          label: 'Add Listing',    Icon: PlusCircle,      roles: ['BROKER', 'ADMIN'] },
   { href: '/dashboard/submissions',  label: 'Submissions',    Icon: Inbox,           roles: ['BROKER', 'ADMIN'] },
+  { href: '/dashboard/deals',        label: 'Deals',          Icon: Handshake,       roles: ['BROKER', 'ADMIN'] },
   { href: '/dashboard/all-listings', label: 'All Listings',   Icon: ListChecks,      roles: ['ADMIN'], adminOnly: true },
   { href: '/dashboard/users',        label: 'Users',          Icon: Users,           roles: ['ADMIN'] },
   { href: '/dashboard/verifications',label: 'Verifications',  Icon: ShieldCheck,     roles: ['ADMIN'] },
