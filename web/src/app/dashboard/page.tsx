@@ -29,12 +29,15 @@ function StatCard({ label, value, isLoading }: { label: string; value: number | 
 
 function AdminOverview() {
   const { user } = useAuthStore()
-  const { data: allListings, isLoading: loadingListings } = useAllListings()
-  const { data: users, isLoading: loadingUsers } = useAdminUsers()
-  const { data: pending, isLoading: loadingPending } = useSubmissions('PENDING')
+  const { data: allData, isLoading: loadingListings } = useAllListings({ status: 'ACTIVE' })
+  const { data: unverifiedData } = useAllListings({ status: 'ACTIVE', verified: 'false' })
+  const { data: recentData } = useAllListings({})
+  const { data: usersData, isLoading: loadingUsers } = useAdminUsers({})
+  const { data: pendingData, isLoading: loadingPending } = useSubmissions({ status: 'PENDING' })
 
-  const active = allListings?.filter((l) => l.status === 'ACTIVE').length ?? 0
-  const unverified = allListings?.filter((l) => l.status === 'ACTIVE' && !l.is_verified).length ?? 0
+  const active = allData?.count ?? 0
+  const unverified = unverifiedData?.count ?? 0
+  const pendingCount = pendingData?.count ?? 0
 
   return (
     <div className="max-w-3xl space-y-8">
@@ -45,16 +48,16 @@ function AdminOverview() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard label="Active Listings" value={active} isLoading={loadingListings} />
-        <StatCard label="Total Listings" value={allListings?.length ?? 0} isLoading={loadingListings} />
-        <StatCard label="Total Users" value={users?.length ?? 0} isLoading={loadingUsers} />
-        <StatCard label="Pending Submissions" value={pending?.length ?? 0} isLoading={loadingPending} />
+        <StatCard label="Total Users" value={usersData?.count ?? 0} isLoading={loadingUsers} />
+        <StatCard label="Pending Submissions" value={pendingCount} isLoading={loadingPending} />
+        <StatCard label="Needs Verification" value={unverified} isLoading={loadingListings} />
       </div>
 
       <div className="flex flex-wrap gap-3">
         <Link href="/dashboard/submissions">
           <Button size="sm">
             <InboxIcon className="w-4 h-4 mr-2" />
-            Submissions {pending?.length ? `(${pending.length})` : ''}
+            Submissions {pendingCount ? `(${pendingCount})` : ''}
           </Button>
         </Link>
         <Link href="/dashboard/all-listings">
@@ -84,7 +87,7 @@ function AdminOverview() {
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
           </div>
         )}
-        {allListings?.slice(0, 5).map((l) => (
+        {recentData?.results.slice(0, 5).map((l) => (
           <Link
             key={l.id}
             href={`/listings/${l.id}`}
@@ -109,10 +112,12 @@ function AdminOverview() {
 
 function BrokerOverview() {
   const { user } = useAuthStore()
-  const { data: listings, isLoading } = useMyListings()
+  const { data: activeData, isLoading } = useMyListings({ status: 'ACTIVE' })
+  const { data: allData } = useMyListings({})
 
-  const active = listings?.filter((l) => l.status === 'ACTIVE').length ?? 0
-  const totalViews = listings?.reduce((sum, l) => sum + l.view_count, 0) ?? 0
+  const active = activeData?.count ?? 0
+  const total = allData?.count ?? 0
+  const totalViews = allData?.results.reduce((sum, l) => sum + l.view_count, 0) ?? 0
 
   return (
     <div className="max-w-3xl space-y-8">
@@ -123,8 +128,8 @@ function BrokerOverview() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <StatCard label="Active Listings" value={active} isLoading={isLoading} />
-        <StatCard label="Total Listings" value={listings?.length ?? 0} isLoading={isLoading} />
-        <StatCard label="Total Views" value={totalViews} isLoading={isLoading} />
+        <StatCard label="Total Listings" value={total} isLoading={isLoading} />
+        <StatCard label="Total Views (first page)" value={totalViews} isLoading={isLoading} />
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -155,7 +160,7 @@ function BrokerOverview() {
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
           </div>
         )}
-        {!isLoading && listings?.slice(0, 5).map((l) => (
+        {!isLoading && allData?.results.slice(0, 5).map((l) => (
           <Link
             key={l.id}
             href={`/listings/${l.id}`}
@@ -173,7 +178,7 @@ function BrokerOverview() {
             </div>
           </Link>
         ))}
-        {!isLoading && !listings?.length && (
+        {!isLoading && !allData?.count && (
           <p className="text-sm text-muted-foreground">
             No listings yet.{' '}
             <Link href="/dashboard/add" className="text-primary underline">Add one →</Link>
