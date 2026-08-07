@@ -1,20 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ListingGrid } from '@/components/listings/ListingGrid'
+import { HeroCarousel } from '@/components/layout/HeroCarousel'
 import { useFeaturedListings, usePlatformStats } from '@/hooks/useListings'
 import { useTranslation } from '@/lib/useTranslation'
-
-const CATEGORIES = [
-  { key: 'houses', i18n: 'home.categories.houses', emoji: '🏠' },
-  { key: 'lands', i18n: 'home.categories.land', emoji: '🌿' },
-  { key: 'cars', i18n: 'home.categories.cars', emoji: '🚗' },
-  { key: 'machines', i18n: 'home.categories.machines', emoji: '⚙️' },
-]
 
 const HOW_IT_WORKS_KEYS = [
   { step: '01', titleKey: 'home.steps.submit.title', descKey: 'home.steps.submit.description' },
@@ -23,76 +14,17 @@ const HOW_IT_WORKS_KEYS = [
 ]
 
 export default function HomePage() {
-  const [q, setQ] = useState('')
-  const [activeCategory, setActiveCategory] = useState('houses')
-  const router = useRouter()
   const { data: featured, isLoading: featuredLoading } = useFeaturedListings()
   const { data: stats } = usePlatformStats()
   const { t } = useTranslation()
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    router.push(`/browse/${activeCategory}?q=${encodeURIComponent(q)}`)
-  }
-
   return (
     <div>
-      {/* ── Hero ── */}
-      <section className="bg-gradient-to-b from-amber-50 to-background dark:from-amber-950/20 dark:to-background py-16 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
-            {t('home.hero_title')}
-          </h1>
-          <p className="text-muted-foreground mb-8 text-sm">
-            {t('home.hero_subtitle')}
-          </p>
-
-          {/* Search box */}
-          <form
-            onSubmit={handleSearch}
-            className="bg-card border border-border rounded-2xl p-2 shadow-sm"
-          >
-            {/* Category tabs */}
-            <div className="flex gap-1 mb-2 px-1">
-              {CATEGORIES.map(({ key, emoji, i18n }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setActiveCategory(key)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
-                    activeCategory === key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
-                >
-                  <span>{emoji}</span>
-                  <span className="hidden sm:inline">{t(i18n)}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Search input */}
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                <input
-                  type="text"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder={t('home.search_placeholder')}
-                  className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-              <Button type="submit" className="shrink-0">
-                {t('home.search_button')}
-              </Button>
-            </div>
-          </form>
-        </div>
-      </section>
+      {/* ── Hero carousel ── */}
+      <HeroCarousel />
 
       {/* ── Stats strip ── */}
-      <section className="border-b border-border bg-muted/40 py-6 px-4">
+      <section className="border-b border-border bg-muted/40 py-6 px-4 mt-10">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           {[
             { labelKey: 'home.stats.listings', value: stats?.active_listings },
