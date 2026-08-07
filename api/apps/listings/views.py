@@ -320,9 +320,12 @@ class UpdateListingView(APIView):
                 setattr(listing, field, request.data[field])
         listing.save()
 
-        if listing.location and any(f in request.data for f in ["region", "zone", "woreda", "address"]):
-            loc = listing.location
-            for f in ["region", "zone", "woreda", "address"]:
+        location_fields = ["region", "zone", "woreda", "address"]
+        if any(field in request.data for field in location_fields):
+            from apps.listings.models import Location
+
+            loc, _ = Location.objects.get_or_create(listing=listing)
+            for f in location_fields:
                 if f in request.data:
                     setattr(loc, f, request.data[f])
             loc.save()

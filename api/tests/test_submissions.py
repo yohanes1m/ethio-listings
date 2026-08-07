@@ -128,25 +128,30 @@ class TestSubmissionDetail:
 # ── Approve (POST /api/submissions/<id>/approve/) ────────────────────────────
 
 class TestSubmissionApprove:
-    def test_approve_creates_listing(self, broker, broker_client, db):
+    def test_approve_creates_listing(self, admin_client, db):
         sub = ListingRequestFactory()
-        r = broker_client.post(f"/api/submissions/{sub.id}/approve/")
+        r = admin_client.post(f"/api/submissions/{sub.id}/approve/")
         assert r.status_code == 201
         assert Listing.objects.count() == 1
 
-    def test_approve_links_submission_to_listing(self, broker_client, db):
+    def test_approve_links_submission_to_listing(self, admin_client, db):
         sub = ListingRequestFactory()
-        broker_client.post(f"/api/submissions/{sub.id}/approve/")
+        admin_client.post(f"/api/submissions/{sub.id}/approve/")
         sub.refresh_from_db()
         assert sub.listing is not None
         assert sub.status == SubmissionStatus.APPROVED
 
-    def test_approved_listing_has_correct_location(self, broker_client, db):
+    def test_approved_listing_has_correct_location(self, admin_client, db):
         sub = ListingRequestFactory(region="Oromia", woreda="Adama")
-        broker_client.post(f"/api/submissions/{sub.id}/approve/")
+        admin_client.post(f"/api/submissions/{sub.id}/approve/")
         listing = Listing.objects.first()
         assert listing.location.region == "Oromia"
         assert listing.location.woreda == "Adama"
+
+    def test_broker_cannot_approve(self, broker_client, db):
+        sub = ListingRequestFactory()
+        r = broker_client.post(f"/api/submissions/{sub.id}/approve/")
+        assert r.status_code == 403
 
     def test_buyer_cannot_approve(self, buyer_client, db):
         sub = ListingRequestFactory()

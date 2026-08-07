@@ -45,3 +45,17 @@ def broker_client(broker):
 @pytest.fixture
 def admin_client(admin):
     return auth_client(admin)
+
+
+@pytest.fixture
+def role_users(buyer, broker, admin):
+    return {
+        "BUYER": buyer,
+        "BROKER": broker,
+        "ADMIN": admin,
+    }
+
+
+@pytest.fixture
+def role_clients(role_users):
+    return {role: auth_client(user) for role, user in role_users.items()}
