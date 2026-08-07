@@ -112,8 +112,8 @@ class TestMediaDelete:
 # ── Set main image ────────────────────────────────────────────────────────────
 
 class TestMediaPatch:
-    def test_set_as_main_image(self, broker_client, db):
-        listing = ListingFactory()
+    def test_set_as_main_image(self, broker, broker_client, db):
+        listing = ListingFactory(user=broker)
         m1 = ListingMediaFactory(listing=listing, is_main=True)
         m2 = ListingMediaFactory(listing=listing, is_main=False)
 
@@ -128,8 +128,8 @@ class TestMediaPatch:
         assert m2.is_main is True
         assert m1.is_main is False
 
-    def test_set_order(self, broker_client, db):
-        listing = ListingFactory()
+    def test_set_order(self, broker, broker_client, db):
+        listing = ListingFactory(user=broker)
         media = ListingMediaFactory(listing=listing, order=0)
 
         r = broker_client.patch(

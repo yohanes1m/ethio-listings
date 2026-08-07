@@ -76,8 +76,8 @@ class AdminListingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        from apps.common.permissions import IsBrokerOrAdmin
-        IsBrokerOrAdmin().check_object_permissions(request, None)
+        from apps.common.permissions import IsAdmin
+        IsAdmin().check_object_permissions(request, None)
         qs = (
             Listing.objects.select_related("location", "user")
             .prefetch_related("media")
@@ -255,6 +255,10 @@ class CloseListingView(APIView):
 
         IsBrokerOrAdmin().check_object_permissions(request, None)
         listing = Listing.objects.get(pk=pk)
+
+        if listing.user != request.user and getattr(request.user, "role", None) != "ADMIN":
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
 
         new_status = (
             ListingStatus.RENTED

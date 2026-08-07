@@ -35,6 +35,21 @@ export function useUpdateSubmission() {
   })
 }
 
+export function useApproveSubmission() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      authApiClient.post(`/submissions/${id}/approve/`).then((r) => r.data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['submissions'] })
+      toast.success('Submission approved — listing is now live')
+    },
+    onError: () => {
+      toast.error('Approval failed — please try again')
+    },
+  })
+}
+
 export function useSubmit() {
   const queryClient = useQueryClient()
 

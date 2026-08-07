@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSubmissions, useUpdateSubmission } from '@/hooks/useSubmissions'
+import { useSubmissions, useUpdateSubmission, useApproveSubmission } from '@/hooks/useSubmissions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,6 +21,7 @@ export default function SubmissionsPage() {
   const [tab, setTab] = useState<SubmissionStatus | 'ALL'>('ALL')
   const { data, isLoading } = useSubmissions(tab === 'ALL' ? undefined : tab)
   const update = useUpdateSubmission()
+  const approve = useApproveSubmission()
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -85,6 +86,16 @@ export default function SubmissionsPage() {
                       disabled={update.isPending}
                     >
                       Mark Contacted
+                    </Button>
+                  )}
+                  {(s.status === 'PENDING' || s.status === 'CONTACTED') && (
+                    <Button
+                      size="sm"
+                      className="text-xs h-7 bg-emerald-600 hover:bg-emerald-700 text-white"
+                      onClick={() => approve.mutate(s.id)}
+                      disabled={approve.isPending}
+                    >
+                      Approve → Publish
                     </Button>
                   )}
                   {s.status !== 'REJECTED' && s.status !== 'APPROVED' && (

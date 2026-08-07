@@ -33,13 +33,19 @@ class ListingMediaDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, listing_id, pk):
-        media = ListingMedia.objects.get(pk=pk, listing_id=listing_id)
+        from rest_framework.exceptions import PermissionDenied
+        media = ListingMedia.objects.select_related("listing").get(pk=pk, listing_id=listing_id)
+        if media.listing.user != request.user and getattr(request.user, "role", None) != "ADMIN":
+            raise PermissionDenied()
         delete_file(media.url, media.cloudinary_public_id)
         media.delete()
         return Response(status=204)
 
     def patch(self, request, listing_id, pk):
-        media = ListingMedia.objects.get(pk=pk, listing_id=listing_id)
+        from rest_framework.exceptions import PermissionDenied
+        media = ListingMedia.objects.select_related("listing").get(pk=pk, listing_id=listing_id)
+        if media.listing.user != request.user and getattr(request.user, "role", None) != "ADMIN":
+            raise PermissionDenied()
         if request.data.get("is_main"):
             ListingMedia.objects.filter(listing_id=listing_id).update(is_main=False)
             media.is_main = True

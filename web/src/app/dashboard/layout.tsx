@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import {
   LayoutDashboard,
   ListChecks,
@@ -44,7 +45,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const { user } = useAuthStore()
   const logout = useLogout()
   const pathname = usePathname()
+  const router = useRouter()
   const role = user?.role ?? ''
+
+  useEffect(() => {
+    if (user && role === 'BUYER') {
+      router.replace('/saved')
+    }
+  }, [user, role, router])
 
   const visibleNav = NAV.filter((item) => item.roles.includes(role))
 
