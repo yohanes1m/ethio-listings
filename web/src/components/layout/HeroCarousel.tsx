@@ -60,28 +60,27 @@ export function HeroCarousel() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const paused = useRef(false)
   const pointerStart = useRef<number | null>(null)
+  const currentRef = useRef(current)
+  useEffect(() => { currentRef.current = current }, [current])
 
   const goTo = useCallback((idx: number) => {
-    const clamped = (idx + SLIDES.length) % SLIDES.length
-    setCurrent(clamped)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    setActiveCategory(SLIDES[clamped]!.key)
+    setCurrent((idx + SLIDES.length) % SLIDES.length)
   }, [])
 
-  const next = useCallback(() => goTo(current + 1), [current, goTo])
-  const prev = useCallback(() => goTo(current - 1), [current, goTo])
+  const next = useCallback(() => goTo(currentRef.current + 1), [goTo])
+  const prev = useCallback(() => goTo(currentRef.current - 1), [goTo])
 
-  const resetTimer = useCallback(() => {
+  const startTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
-    if (!paused.current) {
-      timerRef.current = setTimeout(() => { goTo(current + 1) }, INTERVAL)
-    }
-  }, [current, goTo])
+    timerRef.current = setTimeout(() => {
+      if (!paused.current) goTo(currentRef.current + 1)
+    }, INTERVAL)
+  }, [goTo])
 
   useEffect(() => {
-    resetTimer()
+    startTimer()
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
-  }, [resetTimer])
+  }, [current, startTimer])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -106,7 +105,7 @@ export function HeroCarousel() {
         className="relative overflow-hidden"
         style={{ minHeight: 'clamp(440px, 58vh, 600px)' }}
         onMouseEnter={() => { paused.current = true; if (timerRef.current) clearTimeout(timerRef.current) }}
-        onMouseLeave={() => { paused.current = false; resetTimer() }}
+        onMouseLeave={() => { paused.current = false; startTimer() }}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
       >
@@ -219,10 +218,7 @@ export function HeroCarousel() {
                 <button
                   key={slide.key}
                   type="button"
-                  onClick={() => {
-                    setActiveCategory(slide.key)
-                    goTo(SLIDES.findIndex((s) => s.key === slide.key))
-                  }}
+                  onClick={() => setActiveCategory(slide.key)}
                   className={`flex items-center justify-center gap-1.5 flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     active
                       ? 'bg-primary text-primary-foreground'
