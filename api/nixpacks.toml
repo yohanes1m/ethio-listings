@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["gdal", "libpq"]
+nixPkgs = ["gdal"]
 
 [start]
 cmd = "sh start.sh"
