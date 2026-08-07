@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { useState } from 'react'
-import { CheckCircle, Heart, MessageCircle, Send } from 'lucide-react'
+import { CheckCircle, Heart, MessageCircle, Phone, Send } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -156,25 +156,33 @@ export default function ListingDetailPage() {
         {/* Right — broker contact */}
         <div className="space-y-4">
           <div className="rounded-xl border border-border p-5 sticky top-20">
-            <h2 className="font-semibold mb-4">{t('listing.contact_broker')}</h2>
+            <h2 className="font-semibold mb-4">Contact Agent</h2>
 
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                B
+                {listing.broker_name ? listing.broker_name.charAt(0).toUpperCase() : 'B'}
               </div>
-              <div>
-                <p className="font-medium text-sm">Broker</p>
-                <p className="text-xs text-muted-foreground">EthioListings</p>
+              <div className="min-w-0">
+                <p className="font-medium text-sm truncate">{listing.broker_name ?? 'Broker'}</p>
+                <p className="text-xs text-muted-foreground">EthioListings Agent</p>
               </div>
             </div>
 
             <div className="space-y-2">
+              {listing.broker_phone && (
+                <a href={`tel:${listing.broker_phone}`} className="w-full block">
+                  <Button variant="outline" className="w-full">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Call Agent
+                  </Button>
+                </a>
+              )}
               {listing.broker_whatsapp && (
                 <a
                   href={whatsAppLink(listing.broker_whatsapp, title)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full"
+                  className="w-full block"
                 >
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                     <MessageCircle className="w-4 h-4 mr-2" />
@@ -187,7 +195,7 @@ export default function ListingDetailPage() {
                   href={telegramLink(listing.broker_telegram)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full"
+                  className="w-full block"
                 >
                   <Button variant="outline" className="w-full">
                     <Send className="w-4 h-4 mr-2" />
@@ -195,7 +203,7 @@ export default function ListingDetailPage() {
                   </Button>
                 </a>
               )}
-              {!listing.broker_whatsapp && !listing.broker_telegram && (
+              {!listing.broker_phone && !listing.broker_whatsapp && !listing.broker_telegram && (
                 <p className="text-xs text-muted-foreground text-center py-2">
                   Contact info not available
                 </p>

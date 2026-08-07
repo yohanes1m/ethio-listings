@@ -14,6 +14,8 @@ class LocationSerializer(serializers.ModelSerializer):
 class ListingSerializer(serializers.ModelSerializer):
     location = LocationSerializer(read_only=True)
     media = ListingMediaSerializer(many=True, read_only=True)
+    broker_name = serializers.SerializerMethodField()
+    broker_phone = serializers.SerializerMethodField()
     broker_whatsapp = serializers.SerializerMethodField()
     broker_telegram = serializers.SerializerMethodField()
     house_details = serializers.SerializerMethodField()
@@ -29,10 +31,19 @@ class ListingSerializer(serializers.ModelSerializer):
             "description", "description_am", "description_om",
             "price", "price_negotiable", "price_unit",
             "is_verified", "is_featured", "view_count",
-            "location", "media", "broker_whatsapp", "broker_telegram",
+            "location", "media",
+            "broker_name", "broker_phone", "broker_whatsapp", "broker_telegram",
             "house_details", "land_details", "car_details", "machine_details",
             "created_at", "updated_at",
         ]
+
+    def get_broker_name(self, obj):
+        u = obj.user
+        name = f"{u.first_name} {u.last_name}".strip()
+        return name or u.email
+
+    def get_broker_phone(self, obj):
+        return getattr(obj.user, "phone", None)
 
     def get_broker_whatsapp(self, obj):
         try:

@@ -85,6 +85,8 @@ export interface Listing {
   is_verified: boolean
   is_featured: boolean
   view_count: number
+  broker_name: string | null
+  broker_phone: string | null
   broker_whatsapp: string | null
   broker_telegram: string | null
   location?: Location | null

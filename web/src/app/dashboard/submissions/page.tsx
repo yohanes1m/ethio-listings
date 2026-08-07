@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Inbox } from 'lucide-react'
 import { useSubmissions, useUpdateSubmission, useApproveSubmission } from '@/hooks/useSubmissions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { SubmissionStatus } from '@/types/submission'
 
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
@@ -22,6 +24,7 @@ export default function SubmissionsPage() {
   const [tab, setTab] = useState<SubmissionStatus | 'ALL'>('ALL')
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectMessage, setRejectMessage] = useState('')
+  const [approvingId, setApprovingId] = useState<string | null>(null)
   const { data, isLoading } = useSubmissions(tab === 'ALL' ? undefined : tab)
   const update = useUpdateSubmission()
   const approve = useApproveSubmission()
@@ -32,6 +35,8 @@ export default function SubmissionsPage() {
       { onSuccess: () => { setRejectingId(null); setRejectMessage('') } },
     )
   }
+
+  const approvingSubmission = approvingId ? data?.find((s) => s.id === approvingId) : null
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -60,7 +65,7 @@ export default function SubmissionsPage() {
 
       {!isLoading && !data?.length && (
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">📬</p>
+          <Inbox className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <p className="text-muted-foreground">No submissions found.</p>
         </div>
       )}
@@ -102,8 +107,7 @@ export default function SubmissionsPage() {
                     <Button
                       size="sm"
                       className="text-xs h-7 bg-emerald-600 hover:bg-emerald-700 text-white"
-                      onClick={() => approve.mutate(s.id)}
-                      disabled={approve.isPending}
+                      onClick={() => setApprovingId(s.id)}
                     >
                       Approve → Publish
                     </Button>
@@ -169,6 +173,24 @@ export default function SubmissionsPage() {
           })}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!approvingId}
+        onOpenChange={(open) => { if (!open) setApprovingId(null) }}
+        title="Approve and publish listing?"
+        description={
+          approvingSubmission
+            ? `A new ${approvingSubmission.category.toLowerCase()} listing (${approvingSubmission.region}) will be created and published immediately as active.`
+            : 'A new listing will be created from this submission and published immediately as active.'
+        }
+        confirmLabel="Approve → Publish"
+        variant="default"
+        isLoading={approve.isPending}
+        onConfirm={() => {
+          if (approvingId) approve.mutate(approvingId)
+          setApprovingId(null)
+        }}
+      />
     </div>
   )
 }

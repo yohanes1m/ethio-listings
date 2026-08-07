@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { UserPlus, X } from 'lucide-react'
+import { UserPlus, Users, X } from 'lucide-react'
 import { useAdminUsers, useChangeUserRole, useCreateBroker } from '@/hooks/useAdminListings'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoleGuard } from '@/components/auth/RoleGuard'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
   Select,
   SelectContent,
@@ -40,12 +41,20 @@ const EMPTY_FORM = {
   password: '',
 }
 
+type PendingRoleChange = {
+  userId: string
+  userName: string
+  currentRole: string
+  newRole: string
+}
+
 function UsersContent() {
   const { data: users, isLoading } = useAdminUsers()
   const changeRole = useChangeUserRole()
   const createBroker = useCreateBroker()
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
+  const [pendingRole, setPendingRole] = useState<PendingRoleChange | null>(null)
 
   function update(field: string, value: string) {
     setForm((p) => ({ ...p, [field]: value }))
@@ -66,6 +75,49 @@ function UsersContent() {
     }
   }
 
+  function requestRoleChange(
+    userId: string,
+    userName: string,
+    currentRole: string,
+    newRole: string,
+  ) {
+    if (newRole === currentRole) return
+    setPendingRole({ userId, userName, currentRole, newRole })
+  }
+
+  function buildDialogProps(p: PendingRoleChange) {
+    const isPromoToAdmin = p.newRole === 'ADMIN'
+    const isDemoteFromAdmin = p.currentRole === 'ADMIN'
+
+    if (isPromoToAdmin) {
+      return {
+        title: 'Promote to Admin?',
+        description: `${p.userName} will have full admin access — they can manage all listings, users, and platform settings. This is a significant permission change.`,
+        confirmLabel: 'Promote to Admin',
+        variant: 'warning' as const,
+        requireText: p.userName,
+      }
+    }
+    if (isDemoteFromAdmin) {
+      return {
+        title: `Demote ${p.userName}?`,
+        description: `${p.userName} will lose admin access and become a ${p.newRole.charAt(0) + p.newRole.slice(1).toLowerCase()}. They will no longer be able to manage users or verify listings.`,
+        confirmLabel: `Demote to ${p.newRole.charAt(0) + p.newRole.slice(1).toLowerCase()}`,
+        variant: 'warning' as const,
+        requireText: undefined,
+      }
+    }
+    return {
+      title: 'Change user role?',
+      description: `${p.userName} will be changed from ${p.currentRole.charAt(0) + p.currentRole.slice(1).toLowerCase()} to ${p.newRole.charAt(0) + p.newRole.slice(1).toLowerCase()}.`,
+      confirmLabel: 'Change role',
+      variant: 'default' as const,
+      requireText: undefined,
+    }
+  }
+
+  const dialogProps = pendingRole ? buildDialogProps(pendingRole) : null
+
   return (
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
@@ -85,10 +137,17 @@ function UsersContent() {
         </div>
       )}
 
-      {users && (
+      {!isLoading && !users?.length && (
+        <div className="text-center py-20">
+          <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">No users found.</p>
+        </div>
+      )}
+
+      {users && users.length > 0 && (
         <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
           {users.map((u) => (
-            <div key={u.id} className="flex items-center gap-4 p-4 bg-card hover:bg-muted/30 transition-colors">
+            <div key={u.id} className="flex items-center gap-3 p-4 bg-card hover:bg-muted/30 transition-colors">
               <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                 {u.first_name[0]}{u.last_name[0]}
               </div>
@@ -101,7 +160,9 @@ function UsersContent() {
               </Badge>
               <Select
                 value={u.role}
-                onValueChange={(v) => { if (v) changeRole.mutate({ id: u.id, role: v }) }}
+                onValueChange={(v) => {
+                  if (v) requestRoleChange(u.id, `${u.first_name} ${u.last_name}`, u.role, v)
+                }}
               >
                 <SelectTrigger className="w-28 h-7 text-xs">
                   <SelectValue />
@@ -116,6 +177,23 @@ function UsersContent() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!pendingRole}
+        onOpenChange={(open) => { if (!open) setPendingRole(null) }}
+        title={dialogProps?.title ?? ''}
+        description={dialogProps?.description ?? ''}
+        confirmLabel={dialogProps?.confirmLabel ?? 'Confirm'}
+        variant={dialogProps?.variant ?? 'default'}
+        requireText={dialogProps?.requireText}
+        isLoading={changeRole.isPending}
+        onConfirm={() => {
+          if (pendingRole) {
+            changeRole.mutate({ id: pendingRole.userId, role: pendingRole.newRole })
+          }
+          setPendingRole(null)
+        }}
+      />
 
       {/* Create Broker Modal */}
       {showModal && (

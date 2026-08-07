@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { CheckCircle, Star } from 'lucide-react'
 import { useAllListings, useVerifyListing, useFeatureListing } from '@/hooks/useAdminListings'
@@ -8,6 +9,15 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoleGuard } from '@/components/auth/RoleGuard'
 import { Badge } from '@/components/ui/badge'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+
+type PendingAction = {
+  title: string
+  description: string
+  confirmLabel: string
+  variant: 'default' | 'warning'
+  action: () => void
+}
 
 export default function VerificationsPage() {
   return (
@@ -21,8 +31,33 @@ function VerificationsContent() {
   const { data: all, isLoading } = useAllListings()
   const verify = useVerifyListing()
   const feature = useFeatureListing()
+  const [pending, setPending] = useState<PendingAction | null>(null)
 
   const unverified = all?.filter((l) => !l.is_verified && l.status === 'ACTIVE') ?? []
+
+  const isMutating = verify.isPending || feature.isPending
+
+  function confirmVerify(l: { id: string; title: string }) {
+    setPending({
+      title: 'Verify this listing?',
+      description: `"${l.title}" will receive a verified badge visible to all buyers.`,
+      confirmLabel: 'Verify listing',
+      variant: 'default',
+      action: () => verify.mutate(l.id),
+    })
+  }
+
+  function confirmFeature(l: { id: string; title: string; is_featured: boolean }) {
+    setPending({
+      title: l.is_featured ? 'Remove from featured?' : 'Feature this listing?',
+      description: l.is_featured
+        ? `"${l.title}" will be removed from the featured section on the homepage.`
+        : `"${l.title}" will appear in the featured section on the homepage.`,
+      confirmLabel: l.is_featured ? 'Remove featured' : 'Feature listing',
+      variant: 'default',
+      action: () => feature.mutate(l.id),
+    })
+  }
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -75,8 +110,8 @@ function VerificationsContent() {
                 <Button
                   size="sm"
                   className="text-xs h-7"
-                  onClick={() => verify.mutate(l.id)}
-                  disabled={verify.isPending}
+                  onClick={() => confirmVerify(l)}
+                  disabled={isMutating}
                 >
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Verify
@@ -85,8 +120,8 @@ function VerificationsContent() {
                   variant="outline"
                   size="sm"
                   className="text-xs h-7"
-                  onClick={() => feature.mutate(l.id)}
-                  disabled={feature.isPending}
+                  onClick={() => confirmFeature(l)}
+                  disabled={isMutating}
                 >
                   <Star className="w-3 h-3 mr-1" />
                   {l.is_featured ? 'Unfeature' : 'Feature'}
@@ -96,6 +131,20 @@ function VerificationsContent() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!pending}
+        onOpenChange={(open) => { if (!open) setPending(null) }}
+        title={pending?.title ?? ''}
+        description={pending?.description ?? ''}
+        confirmLabel={pending?.confirmLabel ?? 'Confirm'}
+        variant={pending?.variant ?? 'default'}
+        isLoading={isMutating}
+        onConfirm={() => {
+          pending?.action()
+          setPending(null)
+        }}
+      />
     </div>
   )
 }
