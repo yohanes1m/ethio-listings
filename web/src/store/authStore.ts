@@ -16,9 +16,11 @@ interface AuthState {
   accessToken: string | null
   refreshToken: string | null
   isAuthenticated: boolean
+  _hasHydrated: boolean
   setTokens: (access: string, refresh: string) => void
   setUser: (user: User) => void
   logout: () => void
+  setHasHydrated: (v: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -28,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      _hasHydrated: false,
 
       setTokens: (access, refresh) =>
         set({ accessToken: access, refreshToken: refresh, isAuthenticated: true }),
@@ -41,6 +44,8 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           isAuthenticated: false,
         }),
+
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
     }),
     {
       name: 'ethio-auth',
@@ -50,6 +55,9 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     }
   )
 )

@@ -9,14 +9,17 @@ interface Props {
 }
 
 export function ProtectedRoute({ children }: Props) {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, _hasHydrated } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (_hasHydrated && !isAuthenticated) {
       router.replace('/auth/login')
     }
-  }, [isAuthenticated, router])
+  }, [_hasHydrated, isAuthenticated, router])
+
+  // Hold render until persisted store is rehydrated from localStorage
+  if (!_hasHydrated) return null
 
   if (!isAuthenticated) return null
 
