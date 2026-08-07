@@ -17,7 +17,9 @@ class CarListCreateView(APIView):
         return Response(ListingSerializer(qs, many=True).data)
 
     def post(self, request):
+        from apps.common.permissions import IsBrokerOrAdmin
         from .services import create_car_listing
+        IsBrokerOrAdmin().check_object_permissions(request, None)
         listing = create_car_listing(request.user, request.data)
         return Response(ListingSerializer(listing).data, status=201)
 

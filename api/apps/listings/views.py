@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,7 +15,7 @@ class PublicListingListView(APIView):
     def get(self, request):
         qs = Listing.objects.filter(status=ListingStatus.ACTIVE).select_related(
             "location", "user"
-        ).prefetch_related("media")
+        ).prefetch_related("media").order_by("-created_at")
         if cat := request.query_params.get("category"):
             qs = qs.filter(category=cat)
         if lt := request.query_params.get("listing_type"):
@@ -29,9 +30,11 @@ class PublicListingListView(APIView):
             qs = qs.filter(price__gte=price_min)
         if price_max := request.query_params.get("price_max"):
             qs = qs.filter(price__lte=price_max)
-        total = qs.count()
-        data = ListingSerializer(qs[:100], many=True).data
-        return Response({"count": total, "results": data})
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        page = paginator.paginate_queryset(qs, request)
+        data = ListingSerializer(page, many=True).data
+        return paginator.get_paginated_response(data)
 
 
 class FeaturedListingView(APIView):

@@ -11,7 +11,10 @@ class ListingMediaView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, listing_id):
+        from rest_framework.exceptions import PermissionDenied
         listing = Listing.objects.get(pk=listing_id)
+        if listing.user != request.user and getattr(request.user, "role", None) != "ADMIN":
+            raise PermissionDenied()
         file = request.FILES.get("file")
         if not file:
             return Response({"detail": "No file provided."}, status=400)

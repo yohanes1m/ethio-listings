@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,38 +25,29 @@ export default function EditListingPage() {
   const { data: listing, isLoading } = useListing(id)
   const update = useUpdateListing()
 
-  const [form, setForm] = useState({
-    title: '',
-    title_am: '',
-    description: '',
-    description_am: '',
-    price: '',
-    price_unit: '',
-    price_negotiable: false,
-    status: '',
-    region: '',
-    zone: '',
-    woreda: '',
-    address: '',
-  })
+  function listingToForm(l: typeof listing) {
+    return {
+      title: l?.title ?? '',
+      title_am: l?.title_am ?? '',
+      description: l?.description ?? '',
+      description_am: l?.description_am ?? '',
+      price: l?.price ?? '',
+      price_unit: l?.price_unit ?? '',
+      price_negotiable: l?.price_negotiable ?? false,
+      status: l?.status ?? '',
+      region: l?.location?.region ?? '',
+      zone: l?.location?.zone ?? '',
+      woreda: l?.location?.woreda ?? '',
+      address: l?.location?.address ?? '',
+    }
+  }
 
-  useEffect(() => {
-    if (!listing) return
-    setForm({
-      title: listing.title ?? '',
-      title_am: listing.title_am ?? '',
-      description: listing.description ?? '',
-      description_am: listing.description_am ?? '',
-      price: listing.price ?? '',
-      price_unit: listing.price_unit ?? '',
-      price_negotiable: listing.price_negotiable,
-      status: listing.status,
-      region: listing.location?.region ?? '',
-      zone: listing.location?.zone ?? '',
-      woreda: listing.location?.woreda ?? '',
-      address: listing.location?.address ?? '',
-    })
-  }, [listing])
+  const [seenListing, setSeenListing] = useState(listing)
+  const [form, setForm] = useState(() => listingToForm(listing))
+  if (seenListing !== listing) {
+    setSeenListing(listing)
+    setForm(listingToForm(listing))
+  }
 
   function set(field: string, value: string | boolean) {
     setForm((p) => ({ ...p, [field]: value }))

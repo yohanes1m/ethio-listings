@@ -18,26 +18,27 @@ class TestPublicListings:
         ListingFactory.create_batch(3)
         r = api_client.get("/api/listings/public/")
         assert r.status_code == 200
-        assert len(r.data) == 3
+        assert r.data["count"] == 3
+        assert len(r.data["results"]) == 3
 
     def test_excludes_inactive_listings(self, api_client, db):
         ListingFactory(status=ListingStatus.ACTIVE)
         ListingFactory(status=ListingStatus.SOLD)
         ListingFactory(status=ListingStatus.INACTIVE)
         r = api_client.get("/api/listings/public/")
-        assert len(r.data) == 1
+        assert r.data["count"] == 1
 
     def test_filter_by_category(self, api_client, db):
         ListingFactory(category="HOUSE")
         ListingFactory(category="CAR")
         r = api_client.get("/api/listings/public/?category=HOUSE")
-        assert all(l["category"] == "HOUSE" for l in r.data)
+        assert all(l["category"] == "HOUSE" for l in r.data["results"])
 
     def test_filter_by_listing_type(self, api_client, db):
         ListingFactory(listing_type="SALE")
         ListingFactory(listing_type="RENT")
         r = api_client.get("/api/listings/public/?listing_type=RENT")
-        assert all(l["listing_type"] == "RENT" for l in r.data)
+        assert all(l["listing_type"] == "RENT" for l in r.data["results"])
 
     def test_filter_by_region(self, api_client, db):
         l1 = ListingFactory()
@@ -45,25 +46,25 @@ class TestPublicListings:
         LocationFactory(listing=l1, region="Addis Ababa")
         LocationFactory(listing=l2, region="Oromia")
         r = api_client.get("/api/listings/public/?region=Addis+Ababa")
-        assert len(r.data) == 1
+        assert r.data["count"] == 1
 
     def test_filter_by_verified(self, api_client, db):
         ListingFactory(is_verified=True)
         ListingFactory(is_verified=False)
         r = api_client.get("/api/listings/public/?verified=true")
-        assert all(l["is_verified"] for l in r.data)
+        assert all(l["is_verified"] for l in r.data["results"])
 
     def test_price_range_filter(self, api_client, db):
         ListingFactory(price=1000000)
         ListingFactory(price=5000000)
         r = api_client.get("/api/listings/public/?price_max=2000000")
-        assert len(r.data) == 1
+        assert r.data["count"] == 1
 
     def test_search_by_title(self, api_client, db):
         ListingFactory(title="Spacious villa in Bole")
         ListingFactory(title="Studio apartment Kazanchis")
         r = api_client.get("/api/listings/public/?q=villa")
-        assert len(r.data) == 1
+        assert r.data["count"] == 1
 
 
 # ── Featured listings ─────────────────────────────────────────────────────────

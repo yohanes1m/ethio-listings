@@ -53,8 +53,8 @@ class TestMediaUpload:
         assert r.data["url"].startswith("https://res.cloudinary.com")
         mock_upload.assert_called_once()
 
-    def test_no_file_returns_400(self, broker_client, db):
-        listing = ListingFactory()
+    def test_no_file_returns_400(self, broker, broker_client, db):
+        listing = ListingFactory(user=broker)
         r = broker_client.post(
             f"/api/media/listings/{listing.id}/media/",
             {},

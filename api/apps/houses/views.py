@@ -19,7 +19,9 @@ class HouseListCreateView(APIView):
         return Response(ListingSerializer(qs, many=True).data)
 
     def post(self, request):
+        from apps.common.permissions import IsBrokerOrAdmin
         from .services import create_house_listing
+        IsBrokerOrAdmin().check_object_permissions(request, None)
         listing = create_house_listing(request.user, request.data)
         return Response(ListingSerializer(listing).data, status=201)
 

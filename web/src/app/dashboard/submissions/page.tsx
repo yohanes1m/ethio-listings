@@ -69,7 +69,7 @@ export default function SubmissionsPage() {
                       {new Date(s.created_at).toLocaleDateString()} · {s.owner_phone}
                     </p>
                     {s.owner_message && (
-                      <p className="text-xs text-muted-foreground mt-1 italic">"{s.owner_message}"</p>
+                      <p className="text-xs text-muted-foreground mt-1 italic">&ldquo;{s.owner_message}&rdquo;</p>
                     )}
                   </div>
                   <Badge variant={cfg.variant} className="shrink-0 text-[10px]">{cfg.label}</Badge>

@@ -3,18 +3,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import authApiClient from '@/lib/authApiClient'
 import { useAuthStore } from '@/store/authStore'
-
-interface Favorite {
-  id: string
-  listing: string
-  created_at: string
-}
+import type { Listing } from '@/types/listing'
 
 export function useFavorites() {
   const { isAuthenticated } = useAuthStore()
   return useQuery({
     queryKey: ['favorites'],
-    queryFn: () => authApiClient.get<Favorite[]>('/favorites/').then((r) => r.data),
+    queryFn: () => authApiClient.get<Listing[]>('/favorites/').then((r) => r.data),
     enabled: isAuthenticated,
   })
 }
@@ -22,7 +17,7 @@ export function useFavorites() {
 export function useToggleFavorite(listingId: string) {
   const queryClient = useQueryClient()
   const { data: favorites } = useFavorites()
-  const isSaved = favorites?.some((f) => f.listing === listingId) ?? false
+  const isSaved = favorites?.some((f) => f.id === listingId) ?? false
 
   const add = useMutation({
     mutationFn: () =>
