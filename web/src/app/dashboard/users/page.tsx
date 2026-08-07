@@ -62,8 +62,8 @@ function UsersContent() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [pendingRole, setPendingRole] = useState<PendingRoleChange | null>(null)
 
-  function setParam(key: string, value: string | number) {
-    setParams((p) => ({ ...p, [key]: value, page: 1 }))
+  function setParam(key: string, value: string | null | number) {
+    setParams((p) => ({ ...p, [key]: value ?? '', page: 1 }))
   }
 
   const hasFilters = params.q !== '' || params.role !== ''
@@ -243,7 +243,7 @@ function UsersContent() {
         description={dialogProps?.description ?? ''}
         confirmLabel={dialogProps?.confirmLabel ?? 'Confirm'}
         variant={dialogProps?.variant ?? 'default'}
-        requireText={dialogProps?.requireText}
+        {...(dialogProps?.requireText !== undefined ? { requireText: dialogProps.requireText } : {})}
         isLoading={changeRole.isPending}
         onConfirm={() => {
           if (pendingRole) {

@@ -51,7 +51,7 @@ function FilterSelect({
   return (
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Select value={filters[filterKey] ?? 'ALL'} onValueChange={(v) => set(filterKey, v === 'ALL' ? '' : v)}>
+      <Select value={filters[filterKey] ?? 'ALL'} onValueChange={(v) => set(filterKey, v && v !== 'ALL' ? v : '')}>
         <SelectTrigger className="h-8 text-xs">
           <SelectValue />
         </SelectTrigger>
@@ -281,7 +281,7 @@ export default function BrowsePage() {
           <Label className="text-xs text-muted-foreground">Type</Label>
           <Select
             value={filters.listing_type ?? 'ALL'}
-            onValueChange={(v) => setFilter('listing_type', v === 'ALL' ? '' : v)}
+            onValueChange={(v) => setFilter('listing_type', v && v !== 'ALL' ? v : '')}
           >
             <SelectTrigger className="h-8 w-32 text-xs">
               <SelectValue />
@@ -298,7 +298,7 @@ export default function BrowsePage() {
           <Label className="text-xs text-muted-foreground">Region</Label>
           <Select
             value={filters.region ?? 'ALL'}
-            onValueChange={(v) => setFilter('region', v === 'ALL' ? '' : v)}
+            onValueChange={(v) => setFilter('region', v && v !== 'ALL' ? v : '')}
           >
             <SelectTrigger className="h-8 w-44 text-xs">
               <SelectValue />

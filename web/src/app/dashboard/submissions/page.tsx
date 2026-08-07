@@ -45,8 +45,8 @@ export default function SubmissionsPage() {
   const update = useUpdateSubmission()
   const approve = useApproveSubmission()
 
-  function setParam(key: string, value: string | number) {
-    setParams((p) => ({ ...p, [key]: value, page: 1 }))
+  function setParam(key: string, value: string | null | number) {
+    setParams((p) => ({ ...p, [key]: value ?? '', page: 1 }))
   }
 
   const hasExtraFilters = params.q !== '' || params.category !== '' || params.listing_type !== ''
@@ -57,7 +57,7 @@ export default function SubmissionsPage() {
 
   function handleReject(id: string) {
     update.mutate(
-      { id, status: 'REJECTED', owner_message: rejectMessage || undefined },
+      { id, status: 'REJECTED', ...(rejectMessage ? { owner_message: rejectMessage } : {}) },
       { onSuccess: () => { setRejectingId(null); setRejectMessage('') } },
     )
   }

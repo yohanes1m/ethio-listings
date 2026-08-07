@@ -47,8 +47,8 @@ function AllListingsContent() {
     Object.fromEntries(Object.entries(params).filter(([, v]) => v !== '' && v !== 0))
   )
 
-  function setParam(key: string, value: string | number) {
-    setParams((p) => ({ ...p, [key]: value, page: 1 }))
+  function setParam(key: string, value: string | null | number) {
+    setParams((p) => ({ ...p, [key]: value ?? '', page: 1 }))
   }
 
   const hasFilters = Object.entries(params).some(([k, v]) => k !== 'page' && v !== '')
