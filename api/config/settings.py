@@ -140,9 +140,7 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ALLOWED_ORIGINS", default="http://localhost:3000"
-).split(",")
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="http://localhost:3000").split(",")
 
 # ── Cache + Redis ────────────────────────────────────────────────────────────
 REDIS_URL = config("REDIS_URL", default="redis://localhost:6379/0")
@@ -184,6 +182,7 @@ FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
 
 OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
 TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
+TELEGRAM_CHANNEL_ID = config("TELEGRAM_CHANNEL_ID", default="")
 
 GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
 

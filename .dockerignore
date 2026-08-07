@@ -1,0 +1,12 @@
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.env
+api/media/
+api/.venv/
+api/.pytest_cache/
+api/.ruff_cache/
+web/
+mini/
+bot/
+.git/
