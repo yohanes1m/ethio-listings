@@ -27,20 +27,21 @@ export function Pagination({ page, count, pageSize = 20, onChange }: PaginationP
   }
 
   return (
-    <div className="flex items-center justify-center gap-1 mt-8">
+    <nav aria-label="Pagination" className="flex items-center justify-center gap-1 mt-8">
       <Button
         variant="outline"
         size="sm"
         onClick={() => onChange(page - 1)}
         disabled={page <= 1}
         className="px-2"
+        aria-label="Previous page"
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className="w-4 h-4" aria-hidden />
       </Button>
 
       {pages.map((p, i) =>
         p === '...' ? (
-          <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground text-sm select-none">
+          <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground text-sm select-none" aria-hidden>
             …
           </span>
         ) : (
@@ -50,6 +51,8 @@ export function Pagination({ page, count, pageSize = 20, onChange }: PaginationP
             size="sm"
             onClick={() => onChange(p as number)}
             className="min-w-[36px]"
+            aria-label={`Page ${p}`}
+            aria-current={p === page ? 'page' : undefined}
           >
             {p}
           </Button>
@@ -62,9 +65,10 @@ export function Pagination({ page, count, pageSize = 20, onChange }: PaginationP
         onClick={() => onChange(page + 1)}
         disabled={page >= totalPages}
         className="px-2"
+        aria-label="Next page"
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className="w-4 h-4" aria-hidden />
       </Button>
-    </div>
+    </nav>
   )
 }
