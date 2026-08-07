@@ -18,7 +18,7 @@ def approve_submission(submission_id: str, broker) -> Listing:
     details = submission.details or {}
 
     listing = Listing.objects.create(
-        user=broker,
+        user=submission.owner,
         category=submission.category,
         listing_type=submission.listing_type,
         title=details.get("title", f"{submission.category.capitalize()} listing"),
@@ -28,7 +28,7 @@ def approve_submission(submission_id: str, broker) -> Listing:
         price=details.get("price") or None,
         price_unit=details.get("price_unit") or None,
         price_negotiable=bool(details.get("price_negotiable", False)),
-        status=ListingStatus.ACTIVE,
+        status=ListingStatus.INACTIVE,
     )
 
     Location.objects.create(
@@ -40,6 +40,10 @@ def approve_submission(submission_id: str, broker) -> Listing:
     )
 
     _create_category_details(listing, submission.category, details)
+
+    from apps.media.models import ListingMedia
+    for i, url in enumerate(submission.photos or []):
+        ListingMedia.objects.create(listing=listing, url=url, order=i, is_main=(i == 0))
 
     submission.listing = listing
     submission.status = SubmissionStatus.APPROVED

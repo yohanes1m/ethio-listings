@@ -78,8 +78,8 @@ class SubmissionApproveView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        from apps.common.permissions import IsBrokerOrAdmin
-        IsBrokerOrAdmin().check_object_permissions(request, None)
+        from apps.common.permissions import IsAdmin
+        IsAdmin().check_object_permissions(request, None)
         from .services import approve_submission
         listing = approve_submission(pk, request.user)
         from apps.listings.serializers import ListingSerializer

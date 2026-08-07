@@ -38,6 +38,7 @@ function SubmitForm() {
     region: '',
     zone: '',
     woreda: '',
+    address: '',
     owner_phone: '',
     owner_whatsapp: '',
   })
@@ -69,6 +70,7 @@ function SubmitForm() {
       region: form.region,
       zone: form.zone || undefined,
       woreda: form.woreda || undefined,
+      address: form.address || undefined,
       owner_phone: form.owner_phone,
       ...(form.owner_whatsapp ? { owner_whatsapp: form.owner_whatsapp } : {}),
       details: form.details,
@@ -220,8 +222,8 @@ function SubmitForm() {
                   Address <span className="text-muted-foreground font-normal">(optional)</span>
                 </Label>
                 <Input
-                  value={String(form.details.address ?? '')}
-                  onChange={(e) => updateDetail('address', e.target.value)}
+                  value={form.address}
+                  onChange={(e) => update('address', e.target.value)}
                   placeholder="Street, building, landmark..."
                 />
               </div>

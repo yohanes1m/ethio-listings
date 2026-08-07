@@ -9,66 +9,72 @@ from .models import Listing, ListingStatus
 from .serializers import ListingSerializer, ListingMapSerializer
 
 
+def _apply_public_filters(qs, query_params):
+    if cat := query_params.get("category"):
+        qs = qs.filter(category=cat)
+    if lt := query_params.get("listing_type"):
+        qs = qs.filter(listing_type=lt)
+    if region := query_params.get("region"):
+        qs = qs.filter(location__region=region)
+    if q := query_params.get("q"):
+        qs = qs.filter(Q(title__icontains=q) | Q(title_am__icontains=q))
+    if verified := query_params.get("verified"):
+        qs = qs.filter(is_verified=verified.lower() == "true")
+    if price_min := query_params.get("price_min"):
+        qs = qs.filter(price__gte=price_min)
+    if price_max := query_params.get("price_max"):
+        qs = qs.filter(price__lte=price_max)
+
+    cat = query_params.get("category")
+    if cat == "HOUSE":
+        if beds := query_params.get("bedrooms_min"):
+            qs = qs.filter(house_details__bedrooms__gte=beds)
+        if query_params.get("furnished") == "true":
+            qs = qs.filter(house_details__furnished=True)
+        if query_params.get("parking") == "true":
+            qs = qs.filter(house_details__parking=True)
+    elif cat == "CAR":
+        if make := query_params.get("make"):
+            qs = qs.filter(car_details__make__icontains=make)
+        if fuel := query_params.get("fuel_type"):
+            qs = qs.filter(car_details__fuel_type=fuel)
+        if trans := query_params.get("transmission"):
+            qs = qs.filter(car_details__transmission=trans)
+        if cond := query_params.get("condition"):
+            qs = qs.filter(car_details__condition=cond)
+        if year_min := query_params.get("year_min"):
+            qs = qs.filter(car_details__year__gte=year_min)
+        if year_max := query_params.get("year_max"):
+            qs = qs.filter(car_details__year__lte=year_max)
+    elif cat == "LAND":
+        if land_use := query_params.get("land_use"):
+            qs = qs.filter(land_details__land_use=land_use)
+        if query_params.get("has_title_deed") == "true":
+            qs = qs.filter(land_details__has_title_deed=True)
+        if query_params.get("road_access") == "true":
+            qs = qs.filter(land_details__road_access=True)
+    elif cat == "MACHINE":
+        if mtype := query_params.get("machine_type"):
+            qs = qs.filter(machine_details__machine_type__icontains=mtype)
+        if cond := query_params.get("condition"):
+            qs = qs.filter(machine_details__condition=cond)
+    return qs
+
+
 class PublicListingListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         qs = Listing.objects.filter(status=ListingStatus.ACTIVE).select_related(
-            "location", "user"
-        ).prefetch_related("media").order_by("-created_at")
-        if cat := request.query_params.get("category"):
-            qs = qs.filter(category=cat)
-        if lt := request.query_params.get("listing_type"):
-            qs = qs.filter(listing_type=lt)
-        if region := request.query_params.get("region"):
-            qs = qs.filter(location__region=region)
-        if q := request.query_params.get("q"):
-            qs = qs.filter(Q(title__icontains=q) | Q(title_am__icontains=q))
-        if verified := request.query_params.get("verified"):
-            qs = qs.filter(is_verified=verified.lower() == "true")
-        if price_min := request.query_params.get("price_min"):
-            qs = qs.filter(price__gte=price_min)
-        if price_max := request.query_params.get("price_max"):
-            qs = qs.filter(price__lte=price_max)
-
-        cat = request.query_params.get("category")
-        if cat == "HOUSE":
-            if beds := request.query_params.get("bedrooms_min"):
-                qs = qs.filter(house_details__bedrooms__gte=beds)
-            if request.query_params.get("furnished") == "true":
-                qs = qs.filter(house_details__furnished=True)
-            if request.query_params.get("parking") == "true":
-                qs = qs.filter(house_details__parking=True)
-        elif cat == "CAR":
-            if make := request.query_params.get("make"):
-                qs = qs.filter(car_details__make__icontains=make)
-            if fuel := request.query_params.get("fuel_type"):
-                qs = qs.filter(car_details__fuel_type=fuel)
-            if trans := request.query_params.get("transmission"):
-                qs = qs.filter(car_details__transmission=trans)
-            if cond := request.query_params.get("condition"):
-                qs = qs.filter(car_details__condition=cond)
-            if year_min := request.query_params.get("year_min"):
-                qs = qs.filter(car_details__year__gte=year_min)
-            if year_max := request.query_params.get("year_max"):
-                qs = qs.filter(car_details__year__lte=year_max)
-        elif cat == "LAND":
-            if land_use := request.query_params.get("land_use"):
-                qs = qs.filter(land_details__land_use=land_use)
-            if request.query_params.get("has_title_deed") == "true":
-                qs = qs.filter(land_details__has_title_deed=True)
-            if request.query_params.get("road_access") == "true":
-                qs = qs.filter(land_details__road_access=True)
-        elif cat == "MACHINE":
-            if mtype := request.query_params.get("machine_type"):
-                qs = qs.filter(machine_details__machine_type__icontains=mtype)
-            if cond := request.query_params.get("condition"):
-                qs = qs.filter(machine_details__condition=cond)
-
+            "location", "user", "user__broker_profile"
+        ).prefetch_related(
+            "media", "house_details", "car_details", "land_details", "machine_details"
+        ).order_by("-created_at")
+        qs = _apply_public_filters(qs, request.query_params)
         paginator = PageNumberPagination()
         paginator.page_size = 20
         page = paginator.paginate_queryset(qs, request)
-        data = ListingSerializer(page, many=True).data
+        data = ListingSerializer(page, many=True, context={"request": request}).data
         return paginator.get_paginated_response(data)
 
 
@@ -81,8 +87,10 @@ class FeaturedListingView(APIView):
             return Response(cached)
         qs = Listing.objects.filter(
             status=ListingStatus.ACTIVE, is_featured=True
-        ).select_related("location").prefetch_related("media")[:12]
-        data = ListingSerializer(qs, many=True).data
+        ).select_related("location", "user", "user__broker_profile").prefetch_related(
+            "media", "house_details", "car_details", "land_details", "machine_details"
+        )[:12]
+        data = ListingSerializer(qs, many=True, context={"request": request}).data
         cache.set("featured_listings", data, 30)
         return Response(data)
 
@@ -94,8 +102,7 @@ class ListingMapView(APIView):
         qs = Listing.objects.filter(
             status=ListingStatus.ACTIVE, location__lat__isnull=False
         ).select_related("location")
-        if cat := request.query_params.get("category"):
-            qs = qs.filter(category=cat)
+        qs = _apply_public_filters(qs, request.query_params)
         return Response(ListingMapSerializer(qs[:500], many=True).data)
 
 
@@ -105,8 +112,8 @@ class MyListingsView(APIView):
     def get(self, request):
         qs = (
             Listing.objects.filter(user=request.user)
-            .select_related("location")
-            .prefetch_related("media")
+            .select_related("location", "user", "user__broker_profile")
+            .prefetch_related("media", "house_details", "car_details", "land_details", "machine_details")
             .order_by("-created_at")
         )
         if q := request.query_params.get("q"):
@@ -120,7 +127,7 @@ class MyListingsView(APIView):
         paginator = PageNumberPagination()
         paginator.page_size = 20
         page = paginator.paginate_queryset(qs, request)
-        return paginator.get_paginated_response(ListingSerializer(page, many=True).data)
+        return paginator.get_paginated_response(ListingSerializer(page, many=True, context={"request": request}).data)
 
 
 class AdminListingsView(APIView):
@@ -130,8 +137,8 @@ class AdminListingsView(APIView):
         from apps.common.permissions import IsAdmin
         IsAdmin().check_object_permissions(request, None)
         qs = (
-            Listing.objects.select_related("location", "user")
-            .prefetch_related("media")
+            Listing.objects.select_related("location", "user", "user__broker_profile")
+            .prefetch_related("media", "house_details", "car_details", "land_details", "machine_details")
             .order_by("-created_at")
         )
         if q := request.query_params.get("q"):
@@ -151,7 +158,7 @@ class AdminListingsView(APIView):
         paginator = PageNumberPagination()
         paginator.page_size = 20
         page = paginator.paginate_queryset(qs, request)
-        return paginator.get_paginated_response(ListingSerializer(page, many=True).data)
+        return paginator.get_paginated_response(ListingSerializer(page, many=True, context={"request": request}).data)
 
 
 class CreateListingView(APIView):
@@ -253,7 +260,7 @@ class ListingDetailView(APIView):
                 raise NotFound()
 
         Listing.objects.filter(pk=pk).update(view_count=listing.view_count + 1)
-        return Response(ListingSerializer(listing).data)
+        return Response(ListingSerializer(listing, context={"request": request}).data)
 
 
 class ListingDashboardView(APIView):
@@ -329,45 +336,12 @@ class CloseListingView(APIView):
 
     def post(self, request, pk):
         from apps.common.permissions import IsBrokerOrAdmin
-        from apps.deals.models import Deal
+        from apps.deals.services import close_deal
 
         IsBrokerOrAdmin().check_object_permissions(request, None)
-        listing = Listing.objects.get(pk=pk)
-
-        if listing.user != request.user and getattr(request.user, "role", None) != "ADMIN":
-            from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied()
-
-        new_status = (
-            ListingStatus.RENTED
-            if listing.listing_type == "RENT"
-            else ListingStatus.SOLD
-        )
-        listing.status = new_status
-        listing.save()
-
-        data = request.data
-        if any(data.get(f) for f in ["actual_price", "commission_rate", "notes"]):
-            actual_price = data.get("actual_price") or None
-            commission_rate = data.get("commission_rate") or None
-            commission_amount = None
-            if actual_price and commission_rate:
-                try:
-                    commission_amount = float(actual_price) * float(commission_rate) / 100
-                except (ValueError, TypeError):
-                    pass
-
-            Deal.objects.create(
-                listing=listing,
-                closed_by=request.user,
-                actual_price=actual_price,
-                commission_rate=commission_rate,
-                commission_amount=commission_amount,
-                notes=data.get("notes") or None,
-            )
-
+        deal = close_deal(pk, request.user, request.data)
         cache.delete("platform_stats")
-        return Response({"status": new_status})
+        return Response({"status": deal.listing.status})
 
 
 class StatsView(APIView):

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import transaction
 
 from apps.listings.models import Listing, ListingStatus
@@ -21,7 +22,7 @@ def close_deal(listing_id: str, broker, data: dict) -> Deal:
     commission_amount = data.get("commission_amount")
 
     if actual_price and commission_rate and not commission_amount:
-        commission_amount = float(actual_price) * float(commission_rate) / 100
+        commission_amount = Decimal(str(actual_price)) * Decimal(str(commission_rate)) / Decimal("100")
 
     new_status = (
         ListingStatus.RENTED

@@ -43,15 +43,24 @@ class ListingSerializer(serializers.ModelSerializer):
         return name or u.email
 
     def get_broker_phone(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
         return getattr(obj.user, "phone", None)
 
     def get_broker_whatsapp(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
         try:
             return obj.user.broker_profile.whatsapp_phone
         except Exception:
             return None
 
     def get_broker_telegram(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
         try:
             return obj.user.broker_profile.telegram_username
         except Exception:
