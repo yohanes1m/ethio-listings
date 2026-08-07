@@ -15,9 +15,11 @@ export function getLocalizedDescription(listing: Listing, lang: Language): strin
 
 export function getMainImage(listing: Listing): string | null {
   const media = listing.media ?? []
-  const main = media.find((m) => m.is_main)
+  // Prefer the flagged main image; fall back to first image-only media.
+  // Videos cannot be passed to Next.js <Image> — skip them for card thumbnails.
+  const main = media.find((m) => m.is_main && m.media_type === 'IMAGE')
   if (main) return main.url
-  return media[0]?.url ?? null
+  return media.find((m) => m.media_type === 'IMAGE')?.url ?? null
 }
 
 export function formatPrice(price: string | null, priceUnit: string | null): string {

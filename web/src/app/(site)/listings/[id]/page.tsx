@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { useState } from 'react'
-import { CheckCircle, Heart, MessageCircle, Phone, Send } from 'lucide-react'
+import { CheckCircle, Heart, MessageCircle, Phone, Play, Send } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -56,17 +56,25 @@ export default function ListingDetailPage() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Left — images + details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Image gallery */}
+          {/* Image/video gallery */}
           {images.length > 0 ? (
             <div className="space-y-2">
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted">
-                <Image
-                  src={images[activeImage]?.url ?? ''}
-                  alt={title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+                {images[activeImage]?.media_type === 'VIDEO' ? (
+                  <video
+                    src={images[activeImage]?.url}
+                    controls
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={images[activeImage]?.url ?? ''}
+                    alt={title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                )}
                 <button
                   onClick={toggle}
                   className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
@@ -86,7 +94,13 @@ export default function ListingDetailPage() {
                         activeImage === i ? 'border-primary' : 'border-transparent'
                       }`}
                     >
-                      <Image src={img.url} alt="" fill className="object-cover" />
+                      {img.media_type === 'VIDEO' ? (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <Play className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                      ) : (
+                        <Image src={img.url} alt="" fill className="object-cover" />
+                      )}
                     </button>
                   ))}
                 </div>

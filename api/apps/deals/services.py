@@ -6,13 +6,20 @@ from .models import Deal
 
 @transaction.atomic
 def close_deal(listing_id: str, broker, data: dict) -> Deal:
+    from rest_framework.exceptions import PermissionDenied, ValidationError
+
     listing = Listing.objects.get(pk=listing_id)
+
+    if listing.user != broker and getattr(broker, "role", None) != "ADMIN":
+        raise PermissionDenied("You can only close your own listings.")
+
+    if listing.status in (ListingStatus.SOLD, ListingStatus.RENTED):
+        raise ValidationError({"detail": "This listing is already closed."})
 
     actual_price = data.get("actual_price")
     commission_rate = data.get("commission_rate")
     commission_amount = data.get("commission_amount")
 
-    # Auto-calculate commission_amount if rate + price provided but amount not given
     if actual_price and commission_rate and not commission_amount:
         commission_amount = float(actual_price) * float(commission_rate) / 100
 

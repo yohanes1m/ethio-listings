@@ -241,7 +241,17 @@ class ListingDetailView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, pk):
+        from rest_framework.exceptions import NotFound
         listing = Listing.objects.select_related("location", "user__broker_profile").get(pk=pk)
+
+        # Non-active listings are only visible to the owner or an admin
+        if listing.status != ListingStatus.ACTIVE:
+            user = request.user
+            is_owner = user.is_authenticated and user == listing.user
+            is_admin = user.is_authenticated and getattr(user, "role", None) == "ADMIN"
+            if not (is_owner or is_admin):
+                raise NotFound()
+
         Listing.objects.filter(pk=pk).update(view_count=listing.view_count + 1)
         return Response(ListingSerializer(listing).data)
 

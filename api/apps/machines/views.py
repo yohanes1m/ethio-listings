@@ -29,9 +29,14 @@ class MachineDetailView(APIView):
         return [AllowAny()] if self.request.method == "GET" else [IsAuthenticated()]
 
     def get(self, request, pk):
+        from rest_framework.exceptions import NotFound
         listing = Listing.objects.select_related("location", "machine_details").get(
             pk=pk, category=ListingCategory.MACHINE
         )
+        if listing.status != ListingStatus.ACTIVE:
+            user = request.user
+            if not (user.is_authenticated and (user == listing.user or getattr(user, "role", None) == "ADMIN")):
+                raise NotFound()
         return Response(ListingSerializer(listing).data)
 
     def patch(self, request, pk):
