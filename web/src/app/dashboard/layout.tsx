@@ -165,8 +165,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const role = user?.role ?? ''
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  useEffect(() => { setDrawerOpen(false) }, [pathname])
-
   useEffect(() => {
     if (user && role === 'BUYER') router.replace('/saved')
   }, [user, role, router])

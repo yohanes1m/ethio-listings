@@ -27,8 +27,9 @@ async function fetchListingMeta(id: string): Promise<ListingMeta | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const listing = await fetchListingMeta(params.id)
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const listing = await fetchListingMeta(id)
   if (!listing) {
     return { title: 'Listing not found — EthioListings' }
   }
@@ -65,6 +66,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default function ListingDetailPage({ params }: { params: { id: string } }) {
-  return <ListingDetailClient id={params.id} />
+export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  return <ListingDetailClient id={id} />
 }
