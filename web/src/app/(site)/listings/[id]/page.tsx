@@ -1,302 +1,70 @@
-'use client'
+import type { Metadata } from 'next'
+import { ListingDetailClient } from './ListingDetailClient'
 
-import { useParams } from 'next/navigation'
-import Image from 'next/image'
-import { useState } from 'react'
-import { CheckCircle, Heart, MessageCircle, Phone, Play, Send } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useListing } from '@/hooks/useListings'
-import { useToggleFavorite } from '@/hooks/useFavorites'
-import { useLanguageStore } from '@/store/languageStore'
-import { useTranslation } from '@/lib/useTranslation'
-import {
-  getLocalizedTitle,
-  getLocalizedDescription,
-  formatPrice,
-  whatsAppLink,
-  telegramLink,
-} from '@/lib/listingUtils'
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api'
 
-export default function ListingDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const { data: listing, isLoading } = useListing(id)
-  const { language } = useLanguageStore()
-  const { isSaved, toggle } = useToggleFavorite(id)
-  const { t } = useTranslation()
-  const [activeImage, setActiveImage] = useState(0)
-
-  if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-4">
-        <Skeleton className="aspect-[16/9] rounded-xl" />
-        <Skeleton className="h-8 w-2/3" />
-        <Skeleton className="h-5 w-1/3" />
-        <Skeleton className="h-32 w-full" />
-      </div>
-    )
-  }
-
-  if (!listing) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <p className="text-muted-foreground">Listing not found.</p>
-      </div>
-    )
-  }
-
-  const title = getLocalizedTitle(listing, language)
-  const description = getLocalizedDescription(listing, language)
-  const price = formatPrice(listing.price, listing.price_unit)
-  const images = (listing.media ?? []).sort((a, b) => a.order - b.order)
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Left — images + details */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Image/video gallery */}
-          {images.length > 0 ? (
-            <div className="space-y-2">
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted">
-                {images[activeImage]?.media_type === 'VIDEO' ? (
-                  <video
-                    src={images[activeImage]?.url}
-                    controls
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src={images[activeImage]?.url ?? ''}
-                    alt={title}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                )}
-                <button
-                  onClick={toggle}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-                >
-                  <Heart
-                    className={`w-5 h-5 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-muted-foreground'}`}
-                  />
-                </button>
-              </div>
-              {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto">
-                  {images.map((img, i) => (
-                    <button
-                      key={img.id}
-                      onClick={() => setActiveImage(i)}
-                      className={`relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${
-                        activeImage === i ? 'border-primary' : 'border-transparent'
-                      }`}
-                    >
-                      {img.media_type === 'VIDEO' ? (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <Play className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                      ) : (
-                        <Image src={img.url} alt="" fill className="object-cover" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="aspect-[4/3] rounded-xl bg-muted flex items-center justify-center text-muted-foreground">
-              No images
-            </div>
-          )}
-
-          {/* Badges */}
-          <div className="flex flex-wrap gap-2">
-            <Badge variant={listing.listing_type === 'SALE' ? 'default' : 'secondary'}>
-              {listing.listing_type === 'SALE' ? t('listing.sale') : t('listing.rent')}
-            </Badge>
-            {listing.is_verified && (
-              <Badge variant="outline" className="text-emerald-600 border-emerald-200">
-                <CheckCircle className="w-3 h-3 mr-1" /> {t('listing.verified')}
-              </Badge>
-            )}
-            {listing.is_featured && (
-              <Badge variant="outline" className="text-amber-600 border-amber-200">
-                {t('listing.featured')}
-              </Badge>
-            )}
-          </div>
-
-          {/* Title + price */}
-          <div>
-            <h1 className="text-2xl font-bold leading-tight">{title}</h1>
-            <p className="text-2xl font-bold text-primary mt-2 tabular-nums">{price}</p>
-            {listing.price_negotiable && (
-              <p className="text-sm text-muted-foreground">{t('listing.negotiable')}</p>
-            )}
-          </div>
-
-          {/* Location */}
-          {listing.location && (
-            <div className="text-sm text-muted-foreground">
-              📍{' '}
-              {[
-                listing.location.region,
-                listing.location.zone,
-                listing.location.woreda,
-                listing.location.neighborhood,
-              ]
-                .filter(Boolean)
-                .join(', ')}
-            </div>
-          )}
-
-          {/* Description */}
-          {description && (
-            <div>
-              <h2 className="font-semibold mb-2">{t('listing.description')}</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                {description}
-              </p>
-            </div>
-          )}
-
-          {/* Category-specific details */}
-          <SpecTable listing={listing} />
-        </div>
-
-        {/* Right — broker contact */}
-        <div className="space-y-4">
-          <div className="rounded-xl border border-border p-5 sticky top-20">
-            <h2 className="font-semibold mb-4">Contact Agent</h2>
-
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                {listing.broker_name ? listing.broker_name.charAt(0).toUpperCase() : 'B'}
-              </div>
-              <div className="min-w-0">
-                <p className="font-medium text-sm truncate">{listing.broker_name ?? 'Broker'}</p>
-                <p className="text-xs text-muted-foreground">EthioListings Agent</p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {listing.broker_phone && (
-                <a href={`tel:${listing.broker_phone}`} className="w-full block">
-                  <Button variant="outline" className="w-full">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Call Agent
-                  </Button>
-                </a>
-              )}
-              {listing.broker_whatsapp && (
-                <a
-                  href={whatsAppLink(listing.broker_whatsapp, title)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full block"
-                >
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    {t('listing.whatsapp')}
-                  </Button>
-                </a>
-              )}
-              {listing.broker_telegram && (
-                <a
-                  href={telegramLink(listing.broker_telegram)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full block"
-                >
-                  <Button variant="outline" className="w-full">
-                    <Send className="w-4 h-4 mr-2" />
-                    {t('listing.telegram')}
-                  </Button>
-                </a>
-              )}
-              {!listing.broker_phone && !listing.broker_whatsapp && !listing.broker_telegram && (
-                <p className="text-xs text-muted-foreground text-center py-2">
-                  Contact info not available
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+interface ListingMeta {
+  title: string | null
+  title_en: string | null
+  description: string | null
+  description_en: string | null
+  price: string | null
+  price_unit: string | null
+  category: string | null
+  listing_type: string | null
+  is_verified: boolean
+  location?: { region: string | null; zone: string | null } | null
+  media?: { url: string; is_main: boolean; media_type: string }[]
 }
 
-function SpecTable({ listing }: { listing: ReturnType<typeof useListing>['data'] }) {
-  const { t } = useTranslation()
-  if (!listing) return null
+async function fetchListingMeta(id: string): Promise<ListingMeta | null> {
+  try {
+    const res = await fetch(`${API_URL}/listings/${id}/`, { next: { revalidate: 300 } })
+    if (!res.ok) return null
+    return res.json() as Promise<ListingMeta>
+  } catch {
+    return null
+  }
+}
 
-  const rows: [string, string | number | boolean | null | undefined][] = []
-
-  if (listing.house_details) {
-    const h = listing.house_details
-    rows.push(
-      ['Type', h.house_type],
-      ['Bedrooms', h.bedrooms],
-      ['Bathrooms', h.bathrooms],
-      ['Area', h.area_sqm ? `${h.area_sqm} m²` : null],
-      ['Furnished', h.furnished ? 'Yes' : 'No'],
-      ['Parking', h.parking ? 'Yes' : 'No'],
-    )
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const listing = await fetchListingMeta(params.id)
+  if (!listing) {
+    return { title: 'Listing not found — EthioListings' }
   }
 
-  if (listing.land_details) {
-    const l = listing.land_details
-    rows.push(
-      ['Total Area', `${l.total_area} ${l.area_unit}`],
-      ['Land Use', l.land_use],
-      ['Title Deed', l.has_title_deed ? 'Yes' : 'No'],
-      ['Road Access', l.road_access ? 'Yes' : 'No'],
-    )
+  const title = listing.title ?? listing.title_en ?? 'Listing'
+  const desc = listing.description ?? listing.description_en ?? ''
+  const location = listing.location
+    ? [listing.location.region, listing.location.zone].filter(Boolean).join(', ')
+    : ''
+  const typeLabel = listing.listing_type === 'SALE' ? 'For Sale' : 'For Rent'
+  const mainImage = listing.media?.find((m) => m.is_main && m.media_type === 'IMAGE')?.url
+    ?? listing.media?.find((m) => m.media_type === 'IMAGE')?.url
+
+  const ogTitle = `${title}${location ? ` — ${location}` : ''} | EthioListings`
+  const ogDesc = desc
+    ? desc.slice(0, 160)
+    : `${listing.category ?? ''} ${typeLabel.toLowerCase()}${listing.price ? ` · ETB ${parseFloat(listing.price).toLocaleString('en-ET')}` : ''}${location ? ` · ${location}` : ''}`
+
+  return {
+    title: ogTitle,
+    description: ogDesc,
+    openGraph: {
+      title: ogTitle,
+      description: ogDesc,
+      type: 'article',
+      ...(mainImage ? { images: [{ url: mainImage, width: 1200, height: 630, alt: title }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ogTitle,
+      description: ogDesc,
+      ...(mainImage ? { images: [mainImage] } : {}),
+    },
   }
+}
 
-  if (listing.car_details) {
-    const c = listing.car_details
-    rows.push(
-      ['Make', c.make],
-      ['Model', c.model],
-      ['Year', c.year],
-      ['Mileage', c.mileage_km ? `${c.mileage_km.toLocaleString()} km` : null],
-      ['Transmission', c.transmission],
-      ['Fuel', c.fuel_type],
-      ['Condition', c.condition],
-      ['Color', c.color],
-    )
-  }
-
-  if (listing.machine_details) {
-    const m = listing.machine_details
-    rows.push(
-      ['Type', m.machine_type],
-      ['Manufacturer', m.manufacturer],
-      ['Year', m.year],
-      ['Condition', m.condition],
-      ['Operating Hours', m.operating_hours],
-    )
-  }
-
-  const visible = rows.filter(([, v]) => v != null && v !== '')
-  if (visible.length === 0) return null
-
-  return (
-    <div>
-      <h2 className="font-semibold mb-3">{t('listing.specifications')}</h2>
-      <div className="rounded-xl border border-border divide-y divide-border">
-        {visible.map(([label, value]) => (
-          <div key={label} className="flex justify-between px-4 py-2.5 text-sm">
-            <span className="text-muted-foreground">{label}</span>
-            <span className="font-medium capitalize">{String(value)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+export default function ListingDetailPage({ params }: { params: { id: string } }) {
+  return <ListingDetailClient id={params.id} />
 }
