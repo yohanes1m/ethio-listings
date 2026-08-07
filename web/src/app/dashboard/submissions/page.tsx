@@ -149,22 +149,63 @@ export default function SubmissionsPage() {
         <div className="space-y-3">
           {submissions.map((s) => {
             const cfg = STATUS_CONFIG[s.status]
+            const details = s.details ?? {}
             return (
               <div key={s.id} className="rounded-xl border border-border p-4 space-y-3 bg-card">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium capitalize">
                       {s.category.toLowerCase()} · {s.listing_type} · {s.region}{s.woreda ? `, ${s.woreda}` : ''}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {new Date(s.created_at).toLocaleDateString()} · {s.owner_phone}
+                      {new Date(s.created_at).toLocaleDateString()}
+                      {s.owner_name && <> · <span className="font-medium text-foreground">{s.owner_name}</span></>}
+                      {' · '}{s.owner_phone}
                     </p>
+                    {s.address && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{s.address}</p>
+                    )}
                     {s.owner_message && (
                       <p className="text-xs text-muted-foreground mt-1 italic">&ldquo;{s.owner_message}&rdquo;</p>
                     )}
                   </div>
                   <Badge variant={cfg.variant} className="shrink-0 text-[10px]">{cfg.label}</Badge>
                 </div>
+
+                {/* Photos */}
+                {s.photos && s.photos.length > 0 && (
+                  <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+                    {s.photos.slice(0, 6).map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt={`Photo ${i + 1}`}
+                          className="w-20 h-16 object-cover rounded-lg border border-border"
+                        />
+                      </a>
+                    ))}
+                    {s.photos.length > 6 && (
+                      <div className="shrink-0 w-20 h-16 rounded-lg bg-muted flex items-center justify-center text-xs text-muted-foreground border border-border">
+                        +{s.photos.length - 6}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Category details */}
+                {Object.keys(details).length > 0 && (
+                  <div className="flex flex-wrap gap-x-4 gap-y-1">
+                    {Object.entries(details).map(([k, v]) =>
+                      v != null && v !== '' ? (
+                        <span key={k} className="text-xs text-muted-foreground">
+                          <span className="capitalize">{k.replace(/_/g, ' ')}</span>:{' '}
+                          <span className="text-foreground font-medium">{String(v)}</span>
+                        </span>
+                      ) : null
+                    )}
+                  </div>
+                )}
 
                 <div className="flex flex-wrap gap-2">
                   {s.status === 'PENDING' && (
