@@ -16,4 +16,4 @@ COPY api/ .
 
 EXPOSE 8000
 
-CMD gunicorn config.wsgi:application --bind "0.0.0.0:${PORT:-8000}" --workers 2 --timeout 60
+CMD ["sh", "start.sh"]
