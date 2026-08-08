@@ -88,6 +88,12 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", default="postgres"),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="5432"),
+        "OPTIONS": {
+            # Supabase installs PostGIS in the 'extensions' schema.
+            # Without this, the PostGIS backend can't find geometry types
+            # during migrations and migrate fails.
+            "options": config("DB_OPTIONS", default="-c search_path=public,extensions"),
+        },
     }
 }
 
