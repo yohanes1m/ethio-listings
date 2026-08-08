@@ -15,14 +15,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useListing } from '@/hooks/useListings'
+import { useAuthListing } from '@/hooks/useListings'
 import { useUpdateListing } from '@/hooks/useAdminListings'
 import { toast } from 'react-hot-toast'
 
 export default function EditListingPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const { data: listing, isLoading } = useListing(id)
+  const { data: listing, isLoading } = useAuthListing(id)
   const update = useUpdateListing()
 
   function listingToForm(l: typeof listing) {

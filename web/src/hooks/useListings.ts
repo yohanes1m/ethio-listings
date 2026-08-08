@@ -72,6 +72,15 @@ export function useListing(id: string) {
   })
 }
 
+export function useAuthListing(id: string) {
+  return useQuery({
+    queryKey: ['listings', 'auth', id],
+    queryFn: () =>
+      authApiClient.get<Listing>(`/listings/${id}/`).then((r) => r.data),
+    enabled: !!id,
+  })
+}
+
 export function useMapPins(params: PublicListingsParams = {}) {
   return useQuery({
     queryKey: ['listings', 'map', params],
