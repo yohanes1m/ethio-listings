@@ -121,14 +121,23 @@ LOCATIONS = [
 
 # ── Status/flag combinations ─────────────────────────────────────────────────
 # (status, listing_type, is_verified, is_featured, price_negotiable)
-COMBOS = list(itertools.product(
-    [ListingStatus.ACTIVE, ListingStatus.ACTIVE, ListingStatus.ACTIVE,
-     ListingStatus.INACTIVE, ListingStatus.SOLD, ListingStatus.RENTED, ListingStatus.EXPIRED],
-    [ListingType.SALE, ListingType.RENT],
-    [True, False],   # is_verified
-    [True, False],   # is_featured
-    [True, False],   # price_negotiable
-))
+COMBOS = list(
+    itertools.product(
+        [
+            ListingStatus.ACTIVE,
+            ListingStatus.ACTIVE,
+            ListingStatus.ACTIVE,
+            ListingStatus.INACTIVE,
+            ListingStatus.SOLD,
+            ListingStatus.RENTED,
+            ListingStatus.EXPIRED,
+        ],
+        [ListingType.SALE, ListingType.RENT],
+        [True, False],  # is_verified
+        [True, False],  # is_featured
+        [True, False],  # price_negotiable
+    )
+)
 
 # ── House specs ───────────────────────────────────────────────────────────────
 HOUSE_SPECS = [
@@ -193,26 +202,246 @@ LAND_TITLES = [
 
 # ── Car specs ─────────────────────────────────────────────────────────────────
 CAR_SPECS = [
-    ("Toyota", "Land Cruiser V8", 2020, 58_000, Transmission.AUTOMATIC, FuelType.DIESEL, CarCondition.EXCELLENT, "White", 5_800_000, None),
-    ("Toyota", "Corolla", 2018, 112_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.GOOD, "Silver", 1_650_000, None),
-    ("Hyundai", "Tucson", 2022, 22_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.EXCELLENT, "Blue", 4_200_000, None),
-    ("Isuzu", "NPR", 2019, 175_000, Transmission.MANUAL, FuelType.DIESEL, CarCondition.GOOD, "White", 2_100_000, None),
-    ("BMW", "330i", 2021, 30_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.EXCELLENT, "Black", 6_500_000, None),
-    ("Toyota", "Hiace", 2017, 210_000, Transmission.MANUAL, FuelType.DIESEL, CarCondition.GOOD, "White", 3_500, "per_month"),
-    ("Nissan", "X-Trail", 2019, 88_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.GOOD, "Gray", 3_200_000, None),
-    ("Toyota", "Land Cruiser Prado", 2018, 95_000, Transmission.AUTOMATIC, FuelType.DIESEL, CarCondition.EXCELLENT, "Pearl", 4_800_000, None),
-    ("Mitsubishi", "Pajero", 2015, 140_000, Transmission.AUTOMATIC, FuelType.DIESEL, CarCondition.GOOD, "Silver", 2_800_000, None),
-    ("Toyota", "Hilux", 2021, 45_000, Transmission.MANUAL, FuelType.DIESEL, CarCondition.EXCELLENT, "White", 3_900_000, None),
-    ("Isuzu", "D-Max", 2020, 62_000, Transmission.MANUAL, FuelType.DIESEL, CarCondition.EXCELLENT, "Blue", 3_100_000, None),
-    ("Hyundai", "Sonata", 2019, 78_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.GOOD, "Black", 1_950_000, None),
-    ("Toyota", "Fortuner", 2022, 18_000, Transmission.AUTOMATIC, FuelType.DIESEL, CarCondition.EXCELLENT, "White", 5_200_000, None),
-    ("Mercedes-Benz", "C200", 2020, 42_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.EXCELLENT, "Silver", 7_800_000, None),
-    ("Volkswagen", "Polo", 2018, 95_000, Transmission.MANUAL, FuelType.PETROL, CarCondition.GOOD, "Red", 1_200_000, None),
-    ("Suzuki", "Vitara", 2021, 35_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.EXCELLENT, "Orange", 2_600_000, None),
-    ("Honda", "CR-V", 2019, 72_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.GOOD, "Gray", 3_500_000, None),
-    ("Kia", "Sportage", 2020, 55_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.EXCELLENT, "Red", 3_300_000, None),
-    ("Toyota", "Camry", 2017, 130_000, Transmission.AUTOMATIC, FuelType.PETROL, CarCondition.FAIR, "Champagne", 1_100_000, None),
-    ("Ford", "Ranger", 2021, 48_000, Transmission.AUTOMATIC, FuelType.DIESEL, CarCondition.EXCELLENT, "White", 3_700_000, None),
+    (
+        "Toyota",
+        "Land Cruiser V8",
+        2020,
+        58_000,
+        Transmission.AUTOMATIC,
+        FuelType.DIESEL,
+        CarCondition.EXCELLENT,
+        "White",
+        5_800_000,
+        None,
+    ),
+    (
+        "Toyota",
+        "Corolla",
+        2018,
+        112_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.GOOD,
+        "Silver",
+        1_650_000,
+        None,
+    ),
+    (
+        "Hyundai",
+        "Tucson",
+        2022,
+        22_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.EXCELLENT,
+        "Blue",
+        4_200_000,
+        None,
+    ),
+    (
+        "Isuzu",
+        "NPR",
+        2019,
+        175_000,
+        Transmission.MANUAL,
+        FuelType.DIESEL,
+        CarCondition.GOOD,
+        "White",
+        2_100_000,
+        None,
+    ),
+    (
+        "BMW",
+        "330i",
+        2021,
+        30_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.EXCELLENT,
+        "Black",
+        6_500_000,
+        None,
+    ),
+    (
+        "Toyota",
+        "Hiace",
+        2017,
+        210_000,
+        Transmission.MANUAL,
+        FuelType.DIESEL,
+        CarCondition.GOOD,
+        "White",
+        3_500,
+        "per_month",
+    ),
+    (
+        "Nissan",
+        "X-Trail",
+        2019,
+        88_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.GOOD,
+        "Gray",
+        3_200_000,
+        None,
+    ),
+    (
+        "Toyota",
+        "Land Cruiser Prado",
+        2018,
+        95_000,
+        Transmission.AUTOMATIC,
+        FuelType.DIESEL,
+        CarCondition.EXCELLENT,
+        "Pearl",
+        4_800_000,
+        None,
+    ),
+    (
+        "Mitsubishi",
+        "Pajero",
+        2015,
+        140_000,
+        Transmission.AUTOMATIC,
+        FuelType.DIESEL,
+        CarCondition.GOOD,
+        "Silver",
+        2_800_000,
+        None,
+    ),
+    (
+        "Toyota",
+        "Hilux",
+        2021,
+        45_000,
+        Transmission.MANUAL,
+        FuelType.DIESEL,
+        CarCondition.EXCELLENT,
+        "White",
+        3_900_000,
+        None,
+    ),
+    (
+        "Isuzu",
+        "D-Max",
+        2020,
+        62_000,
+        Transmission.MANUAL,
+        FuelType.DIESEL,
+        CarCondition.EXCELLENT,
+        "Blue",
+        3_100_000,
+        None,
+    ),
+    (
+        "Hyundai",
+        "Sonata",
+        2019,
+        78_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.GOOD,
+        "Black",
+        1_950_000,
+        None,
+    ),
+    (
+        "Toyota",
+        "Fortuner",
+        2022,
+        18_000,
+        Transmission.AUTOMATIC,
+        FuelType.DIESEL,
+        CarCondition.EXCELLENT,
+        "White",
+        5_200_000,
+        None,
+    ),
+    (
+        "Mercedes-Benz",
+        "C200",
+        2020,
+        42_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.EXCELLENT,
+        "Silver",
+        7_800_000,
+        None,
+    ),
+    (
+        "Volkswagen",
+        "Polo",
+        2018,
+        95_000,
+        Transmission.MANUAL,
+        FuelType.PETROL,
+        CarCondition.GOOD,
+        "Red",
+        1_200_000,
+        None,
+    ),
+    (
+        "Suzuki",
+        "Vitara",
+        2021,
+        35_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.EXCELLENT,
+        "Orange",
+        2_600_000,
+        None,
+    ),
+    (
+        "Honda",
+        "CR-V",
+        2019,
+        72_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.GOOD,
+        "Gray",
+        3_500_000,
+        None,
+    ),
+    (
+        "Kia",
+        "Sportage",
+        2020,
+        55_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.EXCELLENT,
+        "Red",
+        3_300_000,
+        None,
+    ),
+    (
+        "Toyota",
+        "Camry",
+        2017,
+        130_000,
+        Transmission.AUTOMATIC,
+        FuelType.PETROL,
+        CarCondition.FAIR,
+        "Champagne",
+        1_100_000,
+        None,
+    ),
+    (
+        "Ford",
+        "Ranger",
+        2021,
+        48_000,
+        Transmission.AUTOMATIC,
+        FuelType.DIESEL,
+        CarCondition.EXCELLENT,
+        "White",
+        3_700_000,
+        None,
+    ),
 ]
 
 # ── Machine specs ─────────────────────────────────────────────────────────────
@@ -228,8 +457,26 @@ MACHINE_SPECS = [
     ("Generator", "Cummins", "250kVA", 2022, MachineCondition.NEW, 0, 4_200_000, None),
     ("Compactor", "Bomag", "BW213", 2019, MachineCondition.USED, 5_500, 6_800_000, None),
     ("Backhoe Loader", "JCB", "3CX", 2020, MachineCondition.RECONDITIONED, 2_800, 7_500_000, None),
-    ("Water Tanker", "Isuzu", "5000L", 2018, MachineCondition.RECONDITIONED, 95_000, 1_500, "per_month"),
-    ("Drilling Rig", "Atlas Copco", "ROC D7", 2015, MachineCondition.USED, 20_000, 22_000_000, None),
+    (
+        "Water Tanker",
+        "Isuzu",
+        "5000L",
+        2018,
+        MachineCondition.RECONDITIONED,
+        95_000,
+        1_500,
+        "per_month",
+    ),
+    (
+        "Drilling Rig",
+        "Atlas Copco",
+        "ROC D7",
+        2015,
+        MachineCondition.USED,
+        20_000,
+        22_000_000,
+        None,
+    ),
     ("Concrete Pump", "Putzmeister", "M52-5", 2021, MachineCondition.NEW, 0, 8_500_000, None),
     ("Generator", "Kirloskar", "62.5kVA", 2023, MachineCondition.NEW, 0, 980_000, None),
 ]
@@ -242,15 +489,31 @@ def _imgs(pool, n=2):
 def _add_images(listing, urls):
     for i, url in enumerate(urls):
         ListingMedia.objects.create(
-            listing=listing, url=url,
-            media_type=MediaType.IMAGE, order=i, is_main=(i == 0),
+            listing=listing,
+            url=url,
+            media_type=MediaType.IMAGE,
+            order=i,
+            is_main=(i == 0),
         )
 
 
 class Command(BaseCommand):
     help = "Seed ~400 listings with all status/type/flag combinations"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--skip-if-seeded",
+            action="store_true",
+            help="No-op if admin@ethiolistings.com already exists (safe for deploy hooks).",
+        )
+
     def handle(self, *args, **options):
+        if options["skip_if_seeded"] and User.objects.filter(
+            email="admin@ethiolistings.com"
+        ).exists():
+            self.stdout.write("Database already seeded — skipping.")
+            return
+
         self.stdout.write("Clearing previous seed data...")
         self._clear()
 
@@ -281,7 +544,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"\nDone! Created {total} listings.\n"))
         self.stdout.write("─" * 55)
         self.stdout.write("  ADMIN    admin@ethiolistings.com / Admin1234!")
-        self.stdout.write("  BROKERS  dawit / meron / beki / tigist / habtamu @broker.com / Broker1234!")
+        self.stdout.write(
+            "  BROKERS  dawit / meron / beki / tigist / habtamu @broker.com / Broker1234!"
+        )
         self.stdout.write("  BUYERS   sara / abel / helen / solomon / john @buyer.com / Buyer1234!")
         self.stdout.write("─" * 55)
 
@@ -302,26 +567,35 @@ class Command(BaseCommand):
         )
 
         admin = User.objects.create_superuser(
-            email="admin@ethiolistings.com", password="Admin1234!",
-            first_name="Yohanis", last_name="Admin",
+            email="admin@ethiolistings.com",
+            password="Admin1234!",
+            first_name="Yohanis",
+            last_name="Admin",
         )
 
         brokers = []
-        for i, (first, last, phone, tg, wa, agency) in enumerate([
+        for first, last, phone, tg, wa, agency in [
             ("Dawit", "Bekele", "+251911223344", "dawit_broker", "+251911223344", agency1),
             ("Meron", "Haile", "+251922334455", "meron_realty", "+251922334455", agency1),
             ("Beki", "Tadesse", "+251933445566", "beki_homes", "+251933445566", agency2),
             ("Tigist", "Alemu", "+251944556677", "tigist_property", "+251944556677", agency2),
             ("Habtamu", "Girma", "+251955667788", "habtamu_listings", "+251955667788", agency1),
-        ]):
+        ]:
             email = f"{first.lower()}@broker.com"
             u = User.objects.create_user(
-                email=email, password="Broker1234!",
-                first_name=first, last_name=last, phone=phone, role=UserRole.BROKER,
+                email=email,
+                password="Broker1234!",
+                first_name=first,
+                last_name=last,
+                phone=phone,
+                role=UserRole.BROKER,
             )
             BrokerProfile.objects.create(
-                user=u, agency=agency, bio=f"Senior broker — {first} {last}",
-                telegram_username=tg, whatsapp_phone=wa,
+                user=u,
+                agency=agency,
+                bio=f"Senior broker — {first} {last}",
+                telegram_username=tg,
+                whatsapp_phone=wa,
             )
             brokers.append(u)
 
@@ -334,8 +608,12 @@ class Command(BaseCommand):
             ("John", "Yohannes", "+251955000105"),
         ]:
             u = User.objects.create_user(
-                email=f"{first.lower()}@buyer.com", password="Buyer1234!",
-                first_name=first, last_name=last, phone=phone, role=UserRole.BUYER,
+                email=f"{first.lower()}@buyer.com",
+                password="Buyer1234!",
+                first_name=first,
+                last_name=last,
+                phone=phone,
+                role=UserRole.BUYER,
             )
             buyers.append(u)
 
@@ -362,7 +640,7 @@ class Command(BaseCommand):
         imgs_cycle = itertools.cycle(range(len(HOUSE_IMGS)))
         specs_cycle = itertools.cycle(HOUSE_SPECS)
 
-        for i in range(n):
+        for _ in range(n):
             user = next(brokers_cycle)
             loc = next(locs_cycle)
             img_idx = next(imgs_cycle)
@@ -387,33 +665,48 @@ class Command(BaseCommand):
             bed_str = str(beds) if beds else "Studio"
             ltype_am = "ሽያጭ" if ltype == ListingType.SALE else "ኪራይ"
             title_tmpl = rng.choice(HOUSE_TITLES)
-            title = (title_tmpl[0]
-                     .replace("{bed}", bed_str)
-                     .replace("{zone}", zone)
-                     .replace("{ltype}", "Sale" if ltype == ListingType.SALE else "Rent"))
-            title_am = (title_tmpl[1]
-                        .replace("{bed}", bed_str)
-                        .replace("{zone}", zone)
-                        .replace("{ltype_am}", ltype_am))
+            title = (
+                title_tmpl[0]
+                .replace("{bed}", bed_str)
+                .replace("{zone}", zone)
+                .replace("{ltype}", "Sale" if ltype == ListingType.SALE else "Rent")
+            )
+            title_am = (
+                title_tmpl[1]
+                .replace("{bed}", bed_str)
+                .replace("{zone}", zone)
+                .replace("{ltype_am}", ltype_am)
+            )
 
             listing = Listing.objects.create(
-                user=user, category=ListingCategory.HOUSE,
-                listing_type=ltype, title=title, title_am=title_am,
-                price=price, price_unit=price_unit,
+                user=user,
+                category=ListingCategory.HOUSE,
+                listing_type=ltype,
+                title=title,
+                title_am=title_am,
+                price=price,
+                price_unit=price_unit,
                 price_negotiable=rng.random() < 0.4,
                 is_verified=rng.random() < 0.5,
                 is_featured=rng.random() < 0.15,
                 status=status,
             )
             Location.objects.create(
-                listing=listing, region=region, zone=zone, woreda=woreda,
+                listing=listing,
+                region=region,
+                zone=zone,
+                woreda=woreda,
                 lat=lat + rng.uniform(-0.01, 0.01),
                 lng=lng + rng.uniform(-0.01, 0.01),
             )
             HouseDetails.objects.create(
-                listing=listing, house_type=house_type,
-                bedrooms=beds, bathrooms=baths, area_sqm=area,
-                furnished=furnished, parking=parking,
+                listing=listing,
+                house_type=house_type,
+                bedrooms=beds,
+                bathrooms=baths,
+                area_sqm=area,
+                furnished=furnished,
+                parking=parking,
             )
             n_imgs = rng.randint(1, 3)
             urls = [HOUSE_IMGS[(img_idx + j) % len(HOUSE_IMGS)] for j in range(n_imgs)]
@@ -429,7 +722,7 @@ class Command(BaseCommand):
         locs_cycle = itertools.cycle(LOCATIONS[5:])  # bias toward non-Addis
         specs_cycle = itertools.cycle(LAND_SPECS)
 
-        for i in range(n):
+        for _ in range(n):
             user = next(brokers_cycle)
             loc = next(locs_cycle)
             spec = next(specs_cycle)
@@ -444,31 +737,44 @@ class Command(BaseCommand):
             area_str = f"{int(total_area) if total_area >= 1 else total_area}"
             unit_str = "m²" if area_unit == AreaUnit.SQM else "ha"
             title_tmpl = rng.choice(LAND_TITLES)
-            title = (title_tmpl[0]
-                     .replace("{area}", area_str)
-                     .replace("{unit}", unit_str)
-                     .replace("{zone}", zone))
-            title_am = (title_tmpl[1]
-                        .replace("{area}", area_str)
-                        .replace("{unit}", unit_str)
-                        .replace("{zone}", zone))
+            title = (
+                title_tmpl[0]
+                .replace("{area}", area_str)
+                .replace("{unit}", unit_str)
+                .replace("{zone}", zone)
+            )
+            title_am = (
+                title_tmpl[1]
+                .replace("{area}", area_str)
+                .replace("{unit}", unit_str)
+                .replace("{zone}", zone)
+            )
 
             listing = Listing.objects.create(
-                user=user, category=ListingCategory.LAND,
-                listing_type=ltype, title=title, title_am=title_am,
-                price=price, price_unit=None,
+                user=user,
+                category=ListingCategory.LAND,
+                listing_type=ltype,
+                title=title,
+                title_am=title_am,
+                price=price,
+                price_unit=None,
                 price_negotiable=rng.random() < 0.5,
                 is_verified=rng.random() < 0.4,
                 is_featured=rng.random() < 0.1,
                 status=status,
             )
             Location.objects.create(
-                listing=listing, region=region, zone=zone, woreda=woreda,
+                listing=listing,
+                region=region,
+                zone=zone,
+                woreda=woreda,
                 lat=lat + rng.uniform(-0.02, 0.02),
                 lng=lng + rng.uniform(-0.02, 0.02),
             )
             LandDetails.objects.create(
-                listing=listing, total_area=total_area, area_unit=area_unit,
+                listing=listing,
+                total_area=total_area,
+                area_unit=area_unit,
                 land_use=land_use,
                 has_title_deed=rng.random() < 0.7 if not has_deed else True,
                 road_access=rng.random() < 0.7 if not road_access else True,
@@ -485,7 +791,7 @@ class Command(BaseCommand):
         locs_cycle = itertools.cycle(LOCATIONS[:15])  # Addis Ababa biased
         specs_cycle = itertools.cycle(CAR_SPECS)
 
-        for i in range(n):
+        for _ in range(n):
             user = next(brokers_cycle)
             loc = next(locs_cycle)
             spec = next(specs_cycle)
@@ -508,23 +814,36 @@ class Command(BaseCommand):
                 title_am += " — ለኪራይ"
 
             listing = Listing.objects.create(
-                user=user, category=ListingCategory.CAR,
-                listing_type=ltype, title=title_en, title_am=title_am,
-                price=price, price_unit=price_unit,
+                user=user,
+                category=ListingCategory.CAR,
+                listing_type=ltype,
+                title=title_en,
+                title_am=title_am,
+                price=price,
+                price_unit=price_unit,
                 price_negotiable=rng.random() < 0.45,
                 is_verified=rng.random() < 0.45,
                 is_featured=rng.random() < 0.12,
                 status=status,
             )
             Location.objects.create(
-                listing=listing, region=region, zone=zone, woreda=woreda,
+                listing=listing,
+                region=region,
+                zone=zone,
+                woreda=woreda,
                 lat=lat + rng.uniform(-0.005, 0.005),
                 lng=lng + rng.uniform(-0.005, 0.005),
             )
             CarDetails.objects.create(
-                listing=listing, make=make, model=model, year=year,
+                listing=listing,
+                make=make,
+                model=model,
+                year=year,
                 mileage_km=mileage + rng.randint(-5_000, 15_000),
-                transmission=trans, fuel_type=fuel, condition=cond, color=color,
+                transmission=trans,
+                fuel_type=fuel,
+                condition=cond,
+                color=color,
             )
             _add_images(listing, _imgs(CAR_IMGS, rng.randint(1, 3)))
             results.append(listing)
@@ -538,7 +857,7 @@ class Command(BaseCommand):
         locs_cycle = itertools.cycle(LOCATIONS)
         specs_cycle = itertools.cycle(MACHINE_SPECS)
 
-        for i in range(n):
+        for _ in range(n):
             user = next(brokers_cycle)
             loc = next(locs_cycle)
             spec = next(specs_cycle)
@@ -559,22 +878,32 @@ class Command(BaseCommand):
                 title_am += " — ለኪራይ"
 
             listing = Listing.objects.create(
-                user=user, category=ListingCategory.MACHINE,
-                listing_type=ltype, title=title_en, title_am=title_am,
-                price=price, price_unit=price_unit,
+                user=user,
+                category=ListingCategory.MACHINE,
+                listing_type=ltype,
+                title=title_en,
+                title_am=title_am,
+                price=price,
+                price_unit=price_unit,
                 price_negotiable=rng.random() < 0.35,
                 is_verified=rng.random() < 0.4,
                 is_featured=rng.random() < 0.1,
                 status=status,
             )
             Location.objects.create(
-                listing=listing, region=region, zone=zone, woreda=woreda,
+                listing=listing,
+                region=region,
+                zone=zone,
+                woreda=woreda,
                 lat=lat + rng.uniform(-0.05, 0.05),
                 lng=lng + rng.uniform(-0.05, 0.05),
             )
             MachineDetails.objects.create(
-                listing=listing, machine_type=mtype, manufacturer=manufacturer,
-                year=year, condition=cond,
+                listing=listing,
+                machine_type=mtype,
+                manufacturer=manufacturer,
+                year=year,
+                condition=cond,
                 operating_hours=max(0, hours + rng.randint(-200, 500)),
             )
             _add_images(listing, _imgs(MACHINE_IMGS, rng.randint(1, 2)))
@@ -603,14 +932,20 @@ class Command(BaseCommand):
         ):
             loc = LOCATIONS[idx % len(LOCATIONS)]
             ListingRequest.objects.create(
-                owner=buyer, assigned_to=assigned,
-                category=cat, listing_type=lt,
+                owner=buyer,
+                assigned_to=assigned,
+                category=cat,
+                listing_type=lt,
                 details={"note": f"Submission {idx+1}"},
                 photos=[],
-                region=loc[0], zone=loc[1], woreda=loc[2],
+                region=loc[0],
+                zone=loc[1],
+                woreda=loc[2],
                 owner_phone=buyer.phone or "+251900000000",
                 status=status,
-                broker_notes="Contacted by phone." if status == SubmissionStatus.CONTACTED else None,
+                broker_notes="Contacted by phone."
+                if status == SubmissionStatus.CONTACTED
+                else None,
             )
 
     def _create_deals(self, brokers):
@@ -626,7 +961,9 @@ class Command(BaseCommand):
                             closed_by=listing.user,
                             actual_price=actual if actual > 0 else None,
                             commission_rate=commission_rate if actual > 0 else None,
-                            commission_amount=(actual * commission_rate / 100) if actual > 0 else None,
+                            commission_amount=(actual * commission_rate / 100)
+                            if actual > 0
+                            else None,
                             notes="Seeded deal.",
                         )
                     except Exception:
