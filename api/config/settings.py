@@ -91,6 +91,19 @@ DATABASES = {
     }
 }
 
+# ── GeoDjango: GDAL/GEOS library paths ───────────────────────────────────────
+# Nix Python (Railway) doesn't resolve Ubuntu apt libraries via ldconfig.
+# Explicitly point Django to the versioned .so files installed by apt.
+import glob as _glob
+
+_gdal_libs = sorted(_glob.glob("/usr/lib/x86_64-linux-gnu/libgdal.so.*"))
+if _gdal_libs:
+    GDAL_LIBRARY_PATH = _gdal_libs[-1]
+
+_geos_libs = sorted(_glob.glob("/usr/lib/x86_64-linux-gnu/libgeos_c.so.*"))
+if _geos_libs:
+    GEOS_LIBRARY_PATH = _geos_libs[-1]
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
